@@ -33,7 +33,6 @@ type szExtractor struct {
 	consumer     *state.Consumer
 	saveConsumer savior.SaveConsumer
 
-	lib     *sz.Lib
 	archive *sz.Archive
 	in      *sz.InStream
 	format  string
@@ -72,16 +71,10 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 		se.free()
 	})
 
-	err := EnsureDeps(consumer)
-	if err != nil {
-		return nil, errors.Wrap(err, "ensuring 7-zip deps")
-	}
-
-	lib, err := sz.NewLib()
+	lib, err := GetLib(consumer)
 	if err != nil {
 		return nil, errors.Wrap(err, "opening 7-zip library")
 	}
-	se.lib = lib
 
 	stats, err := file.Stat()
 	if err != nil {
@@ -423,11 +416,6 @@ func (se *szExtractor) free() {
 	if se.in != nil {
 		se.in.Free()
 		se.in = nil
-	}
-
-	if se.lib != nil {
-		se.lib.Free()
-		se.lib = nil
 	}
 
 	se.freed = true
