@@ -22,7 +22,7 @@ import (
 )
 
 func main() {
-	version := "v1.5.0"
+	version := "1.6.0"
 	osarches := []string{
 		"windows-386",
 		"windows-amd64",
@@ -30,7 +30,7 @@ func main() {
 		"linux-amd64",
 		"darwin-amd64",
 	}
-	baseURL := "https://dl.itch.ovh/libc7zip"
+	baseURL := "https://broth.itch.ovh/libc7zip"
 
 	log.Printf("Generating depsMap for %s", version)
 	depSpecMap := make(types.DepSpecMap)
@@ -48,7 +48,7 @@ func main() {
 
 		ds := types.DepSpec{}
 
-		zipURL := fmt.Sprintf("%s/%s/%s/libc7zip.zip", baseURL, osarch, version)
+		zipURL := fmt.Sprintf("%s/%s/%s/.zip", baseURL, osarch, version)
 
 		f, err := eos.Open(zipURL)
 		must(err)

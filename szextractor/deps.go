@@ -58,7 +58,7 @@ func EnsureDeps(consumer *state.Consumer) error {
 	}
 	execDir := filepath.Dir(execPath)
 
-	lockFilePath := filepath.Join(execDir, ".butler-deps.lock")
+	lockFilePath := filepath.Join(execDir, ".boar-deps.lock")
 	lf, err := lockfile.New(lockFilePath)
 	if err != nil {
 		return errors.WithStack(err)
@@ -95,7 +95,6 @@ func EnsureDeps(consumer *state.Consumer) error {
 
 			f, err := os.Open(entryPath)
 			if err != nil {
-				consumer.Debugf("")
 				consumer.Debugf("[%s] could not open, will fetch", entry.Name)
 				if !os.IsNotExist(err) {
 					consumer.Debugf("  %s", err.Error())
@@ -141,7 +140,6 @@ func EnsureDeps(consumer *state.Consumer) error {
 					// []byte{} literals are not the friendliest. don't @ me.
 					actual := fmt.Sprintf("%x", h.Sum(nil))
 					if actual != expected {
-						consumer.Debugf("")
 						consumer.Debugf("[%s] %s hash mismatch, will fetch", entry.Name, dh.Algo)
 						consumer.Debugf("  wanted %s", expected)
 						consumer.Debugf("     got %s", actual)
@@ -165,6 +163,8 @@ func EnsureDeps(consumer *state.Consumer) error {
 
 			firstSource = false
 			err = func() error {
+				beforeHeal := time.Now()
+
 				f, err := eos.Open(source, option.WithConsumer(consumer))
 				if err != nil {
 					return errors.WithStack(err)
@@ -222,7 +222,7 @@ func EnsureDeps(consumer *state.Consumer) error {
 				if foundFiles < len(toFetch) {
 					return errors.Errorf("Found only %d files of the required %d", foundFiles, len(toFetch))
 				}
-				consumer.Statf("Installed %s's worth of dependencies", humanize.IBytes(uint64(installedSize)))
+				consumer.Statf("Installed %s's worth of dependencies in %s", humanize.IBytes(uint64(installedSize)), time.Since(beforeHeal))
 
 				return nil
 			}()
