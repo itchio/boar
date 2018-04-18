@@ -3,11 +3,19 @@
 package boar
 
 import (
+	"fmt"
+	"io"
+
 	"github.com/itchio/boar/memfs"
+	"github.com/itchio/savior"
 	"github.com/itchio/wharf/state"
 )
 
-var _dummyConsumer = &state.Consumer{}
+var _dummyConsumer = &state.Consumer{
+	OnMessage: func(lvl string, message string) {
+		fmt.Printf("[%s] %s", lvl, message)
+	},
+}
 
 func Fuzz(data []byte) int {
 	file := memfs.New(data, "data")
@@ -16,8 +24,25 @@ func Fuzz(data []byte) int {
 		Consumer: _dummyConsumer,
 	}
 
-	if _, err := Probe(params); err != nil {
+	info, err := Probe(params)
+	if err != nil {
 		return 0
 	}
+
+	_, err = file.Seek(0, io.SeekStart)
+	if err != nil {
+		return 0
+	}
+
+	ex, err := info.GetExtractor(file, _dummyConsumer)
+	if err != nil {
+		return 0
+	}
+
+	_, err = ex.Resume(nil, &savior.NopSink{})
+	if err != nil {
+		return 0
+	}
+
 	return 1
 }

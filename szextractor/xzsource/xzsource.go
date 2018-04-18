@@ -28,7 +28,9 @@ func New(file eos.File, consumer *state.Consumer) (*xzSource, error) {
 
 	subConsumer := &state.Consumer{
 		OnMessage: func(level string, message string) {
-			consumer.OnMessage(level, message)
+			if consumer.OnMessage != nil {
+				consumer.OnMessage(level, message)
+			}
 		},
 		OnProgress: func(progress float64) {
 			xs.progress = progress

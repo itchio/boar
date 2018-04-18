@@ -2,10 +2,14 @@ package boar
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/itchio/wharf/eos"
 	"github.com/itchio/wharf/state"
 	"github.com/stretchr/testify/assert"
 )
@@ -93,4 +97,49 @@ func (ffi fakeFileInfo) Mode() os.FileMode {
 }
 func (ffi fakeFileInfo) Sys() interface{} {
 	return nil
+}
+
+func Test_RealFiles(t *testing.T) {
+	files, err := ioutil.ReadDir("testdata")
+	if err != nil {
+		panic(err)
+	}
+
+	consumer := &state.Consumer{}
+	for _, f := range files {
+		t.Run(f.Name(), func(t *testing.T) {
+			file, err := eos.Open(filepath.Join("testdata", f.Name()))
+			if err != nil {
+				panic(err)
+			}
+
+			defer file.Close()
+			ai, err := Probe(&ProbeParams{
+				File:     file,
+				Consumer: consumer,
+			})
+			if err != nil {
+				panic(err)
+			}
+
+			tokens := strings.Split(f.Name(), "-")
+			lastToken := tokens[len(tokens)-1]
+
+			expectedType := lastToken
+			switch lastToken {
+			case "dmg":
+				expectedType = "hfs"
+			case "rar4":
+				expectedType = "rar"
+			case "gz":
+				expectedType = "tar.gz"
+			case "bz2":
+				expectedType = "tar.bz2"
+			case "xz":
+				expectedType = "tar.xz"
+			}
+
+			assert.EqualValues(t, expectedType, ai.Format)
+		})
+	}
 }

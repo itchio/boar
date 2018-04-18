@@ -130,7 +130,7 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 		return nil, errors.Errorf("could not open with 7-zip, tried %v", attempts)
 	}
 
-	se.format = se.archive.GetArchiveFormat()
+	se.format = strings.ToLower(se.archive.GetArchiveFormat())
 	if se.format == "7z" {
 		// .7z is a known non-resumable format - resuming means a lot
 		// of extra IO and decompression work on already-extracted blocks,
