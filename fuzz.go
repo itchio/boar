@@ -4,15 +4,16 @@ package boar
 
 import (
 	"github.com/itchio/boar/memfs"
+	"github.com/itchio/wharf/state"
 )
 
-_dummyConsumer := &state.Consumer{}
+var _dummyConsumer = &state.Consumer{}
 
 func Fuzz(data []byte) int {
 	file := memfs.New(data, "data")
 	params := &ProbeParams{
-		File: file,
-		Consumer: dummyConsumer,
+		File:     file,
+		Consumer: _dummyConsumer,
 	}
 
 	if _, err := Probe(params); err != nil {
