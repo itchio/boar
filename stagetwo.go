@@ -36,7 +36,7 @@ func (ai *ArchiveInfo) applyMojoSetupStageTwo(consumer *state.Consumer, aRes *sa
 			}
 			defer file.Close()
 
-			archiveInfo, err := Probe(&TryOpenParams{
+			archiveInfo, err := Probe(&ProbeParams{
 				Consumer: consumer,
 				File:     file,
 			})

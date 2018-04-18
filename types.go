@@ -27,7 +27,7 @@ type ExtractParams struct {
 	Save SaveFunc
 }
 
-type TryOpenParams struct {
+type ProbeParams struct {
 	File      eos.File
 	Consumer  *state.Consumer
 	Candidate *dash.Candidate

@@ -67,7 +67,18 @@ type ArchiveInfo struct {
 	PostExtract      []string
 }
 
-func Probe(params *TryOpenParams) (*ArchiveInfo, error) {
+func (ai *ArchiveInfo) String() string {
+	res := ""
+	res += fmt.Sprintf("Format: %s", ai.Format)
+	res += fmt.Sprintf(", Features: %s", ai.Features)
+	if ai.StageTwoStrategy != StageTwoStrategyNone {
+		res += fmt.Sprintf(", StageTwoStrategy: %s", ai.StageTwoStrategy)
+		res += fmt.Sprintf(", PostExtract: %v", ai.PostExtract)
+	}
+	return res
+}
+
+func Probe(params *ProbeParams) (*ArchiveInfo, error) {
 	var strategy ArchiveStrategy
 
 	if params.Candidate != nil && params.Candidate.Flavor == dash.FlavorNativeLinux {
@@ -113,7 +124,6 @@ func Probe(params *TryOpenParams) (*ArchiveInfo, error) {
 			"scripts/mojosetup_init.luac": StageTwoStrategyMojoSetup,
 		}
 
-		params.Consumer.Debugf("Scanning %d entries for a stage two marker...", len(entries))
 		for _, e := range entries {
 			if strat, ok := stageTwoMarkers[e.CanonicalPath]; ok {
 				stageTwoStrategy = strat

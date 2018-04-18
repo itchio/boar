@@ -21,7 +21,7 @@ func SimpleExtract(params *SimpleExtractParams) (*savior.ExtractorResult, error)
 	}
 	defer f.Close()
 
-	ai, err := Probe(&TryOpenParams{
+	ai, err := Probe(&ProbeParams{
 		Consumer: params.Consumer,
 		File:     f,
 	})

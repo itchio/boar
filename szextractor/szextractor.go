@@ -2,6 +2,7 @@ package szextractor
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -82,8 +83,10 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 	}
 	se.in = in
 
+	var tries []string
+
 	// try by extension first
-	consumer.Debugf("Trying by extension '%s'", ext)
+	tries = append(tries, fmt.Sprintf("ext:%s", ext))
 	a, err := lib.OpenArchive(in, false)
 	if err != nil {
 		// try by signature next
@@ -92,7 +95,7 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 			return nil, errors.WithStack(err)
 		}
 
-		consumer.Debugf("Trying by signature")
+		tries = append(tries, "signature")
 		a, err = lib.OpenArchive(in, true)
 		if err != nil {
 			// With the current libc7zip setup, 7-zip will refuse to
@@ -101,12 +104,11 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 			// Maybe the multivolume interface takes care of that?
 			// Command-line `7z` has no issue with them.
 			if ext == "exe" {
-				consumer.Debugf("Trying by extension 'cab'")
-
 				// if it was an .exe, try with a .cab extension
 				in.Free()
 
 				ext = "cab"
+				tries = append(tries, fmt.Sprintf("ext:%s", ext))
 
 				in, err := sz.NewInStream(file, ext, stats.Size())
 				if err != nil {
@@ -115,11 +117,11 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 
 				a, err = lib.OpenArchive(in, false) // by ext
 				if err != nil {
-					return nil, errors.Wrap(err, "opening archive with 7-zip")
+					return nil, errors.WithMessage(err, fmt.Sprintf("could not open with 7-zip (tried %v)", tries))
 				}
 			} else {
 				// well, we're out of options
-				return nil, errors.Errorf("could not open with 7-zip: %s", stats.Name())
+				return nil, errors.Errorf("could not open with 7-zip (tried %v): %s", tries, stats.Name())
 			}
 		}
 	}
