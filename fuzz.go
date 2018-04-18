@@ -10,12 +10,13 @@ _dummyConsumer := &state.Consumer{}
 
 func Fuzz(data []byte) int {
 	file := memfs.New(data, "data")
-	_, err := Probe(&ProbeParams{
+	params := &ProbeParams{
 		File: file,
 		Consumer: dummyConsumer,
-	})
-	if err != nil {
-		panic(err)
 	}
-	return 0
+
+	if _, err := Probe(params); err != nil {
+		return 0
+	}
+	return 1
 }
