@@ -3,6 +3,7 @@ package szextractor
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -87,6 +88,12 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 		return nil, errors.Wrap(err, "stat'ing file")
 	}
 
+	in, err := sz.NewInStream(file, "", stats.Size())
+	if err != nil {
+		return nil, errors.Wrap(err, "creating 7-zip input stream")
+	}
+	se.in = in
+
 	ext := nameToExt(stats.Name())
 
 	var attempts []attempt
@@ -107,21 +114,26 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 	}
 
 	for _, attempt := range attempts {
-		in, err := sz.NewInStream(file, attempt.ext, stats.Size())
+		_, err = in.Seek(0, io.SeekStart)
 		if err != nil {
-			return nil, errors.Wrap(err, "creating 7-zip input stream")
+			in.Free()
+			return nil, errors.WithMessage(err, "while seeking to beginning to open with 7-zip")
 		}
+
+		in.SetExt(attempt.ext)
 
 		archive, err := lib.OpenArchive(in, attempt.signature)
 		if err == nil {
-			se.in = in
 			se.archive = archive
 			break
 		}
-		in.Free()
 	}
 
 	if se.archive == nil {
+		if se.in != nil {
+			se.in.Free()
+			se.in = nil
+		}
 		return nil, errors.Errorf("could not open with 7-zip, tried %v", attempts)
 	}
 
