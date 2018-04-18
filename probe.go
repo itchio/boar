@@ -22,20 +22,39 @@ import (
 	"github.com/itchio/wharf/state"
 )
 
-type ArchiveStrategy int
+type Strategy int
 
 const (
-	ArchiveStrategyNone ArchiveStrategy = 0
+	StrategyNone Strategy = 0
 
-	ArchiveStrategyZip ArchiveStrategy = 100
+	StrategyZip Strategy = 100
 
-	ArchiveStrategyTar    ArchiveStrategy = 200
-	ArchiveStrategyTarGz  ArchiveStrategy = 201
-	ArchiveStrategyTarBz2 ArchiveStrategy = 202
-	ArchiveStrategyTarXz  ArchiveStrategy = 203
+	StrategyTar    Strategy = 200
+	StrategyTarGz  Strategy = 201
+	StrategyTarBz2 Strategy = 202
+	StrategyTarXz  Strategy = 203
 
-	ArchiveStrategySevenZip ArchiveStrategy = 300
+	StrategySevenZip Strategy = 300
 )
+
+func (as Strategy) String() string {
+	switch as {
+	case StrategyZip:
+		return "zip"
+	case StrategyTar:
+		return "tar"
+	case StrategyTarGz:
+		return "tar.gz"
+	case StrategyTarBz2:
+		return "tar.bz2"
+	case StrategyTarXz:
+		return "tar.xz"
+	case StrategySevenZip:
+		return "7-zip"
+	default:
+		return "<no strategy>"
+	}
+}
 
 type StageTwoStrategy int
 
@@ -59,40 +78,40 @@ type EntriesLister interface {
 	Entries() []*savior.Entry
 }
 
-type ArchiveInfo struct {
-	Strategy         ArchiveStrategy
+type Info struct {
+	Strategy         Strategy
 	Features         savior.ExtractorFeatures
 	Format           string
 	StageTwoStrategy StageTwoStrategy
 	PostExtract      []string
 }
 
-func (ai *ArchiveInfo) String() string {
+func (ai *Info) String() string {
 	res := ""
-	res += fmt.Sprintf("Format: %s", ai.Format)
-	res += fmt.Sprintf(", Features: %s", ai.Features)
+	res += fmt.Sprintf("%s (via %s)", ai.Format, ai.Strategy)
+	res += fmt.Sprintf(", %s", ai.Features)
 	if ai.StageTwoStrategy != StageTwoStrategyNone {
-		res += fmt.Sprintf(", StageTwoStrategy: %s", ai.StageTwoStrategy)
-		res += fmt.Sprintf(", PostExtract: %v", ai.PostExtract)
+		res += fmt.Sprintf(", stage two: %s", ai.StageTwoStrategy)
+		res += fmt.Sprintf(", post-extract: %v", ai.PostExtract)
 	}
 	return res
 }
 
-func Probe(params *ProbeParams) (*ArchiveInfo, error) {
-	var strategy ArchiveStrategy
+func Probe(params *ProbeParams) (*Info, error) {
+	var strategy Strategy
 
 	if params.Candidate != nil && params.Candidate.Flavor == dash.FlavorNativeLinux {
 		// might be a mojosetup installer - if not, we won't know what to do with it
-		strategy = ArchiveStrategyZip
+		strategy = StrategyZip
 	} else {
 		strategy = getStrategy(params.File, params.Consumer)
 	}
 
-	if strategy == ArchiveStrategyNone {
+	if strategy == StrategyNone {
 		return nil, ErrUnrecognizedArchiveType
 	}
 
-	info := &ArchiveInfo{
+	info := &Info{
 		Strategy: strategy,
 	}
 
@@ -102,12 +121,36 @@ func Probe(params *ProbeParams) (*ArchiveInfo, error) {
 		return nil, errors.Wrap(err, "getting extractor for file")
 	}
 
-	info.Features = ex.Features()
 	if szex, ok := ex.(szextractor.SzExtractor); ok {
 		info.Format = szex.GetFormat()
+		preferNative := true
+		switch info.Format {
+		case "gzip":
+			info.Strategy = StrategyTarGz
+		case "bzip2":
+			info.Strategy = StrategyTarBz2
+		case "xz":
+			info.Strategy = StrategyTarXz
+		case "tar":
+			info.Strategy = StrategyTar
+		case "zip":
+			info.Strategy = StrategyZip
+		default:
+			preferNative = false
+		}
+
+		if preferNative {
+			ex, err = info.GetExtractor(params.File, params.Consumer)
+			if err != nil {
+				return nil, errors.Wrap(err, "getting extractor for file")
+			}
+
+			info.Format = info.Strategy.String()
+		}
 	} else {
 		info.Format = info.Strategy.String()
 	}
+	info.Features = ex.Features()
 
 	var entries []*savior.Entry
 	stageTwoStrategy := StageTwoStrategyNone
@@ -183,11 +226,11 @@ func Probe(params *ProbeParams) (*ArchiveInfo, error) {
 	return info, nil
 }
 
-func getStrategy(file eos.File, consumer *state.Consumer) ArchiveStrategy {
+func getStrategy(file eos.File, consumer *state.Consumer) Strategy {
 	stats, err := file.Stat()
 	if err != nil {
 		consumer.Warnf("archive: Could not stat file, giving up: %s", err.Error())
-		return ArchiveStrategyNone
+		return StrategyNone
 	}
 
 	lowerName := strings.ToLower(stats.Name())
@@ -198,26 +241,25 @@ func getStrategy(file eos.File, consumer *state.Consumer) ArchiveStrategy {
 
 	switch ext {
 	case ".zip":
-		return ArchiveStrategyZip
+		return StrategyZip
 	case ".tar":
-		return ArchiveStrategyTar
+		return StrategyTar
 	case ".tar.gz":
-		return ArchiveStrategyTarGz
+		return StrategyTarGz
 	case ".tar.bz2":
-		return ArchiveStrategyTarBz2
+		return StrategyTarBz2
 	case ".tar.xz":
-		return ArchiveStrategyTarXz
+		return StrategyTarXz
 	case ".7z", ".rar", ".dmg", ".exe":
-		return ArchiveStrategySevenZip
+		return StrategySevenZip
 	}
 
-	consumer.Warnf("archive: Unrecognized extension (%s), deferring to 7-zip", ext)
-	return ArchiveStrategySevenZip
+	return StrategySevenZip
 }
 
-func (ai *ArchiveInfo) GetExtractor(file eos.File, consumer *state.Consumer) (savior.Extractor, error) {
+func (ai *Info) GetExtractor(file eos.File, consumer *state.Consumer) (savior.Extractor, error) {
 	switch ai.Strategy {
-	case ArchiveStrategyZip:
+	case StrategyZip:
 		stats, err := file.Stat()
 		if err != nil {
 			return nil, errors.Wrap(err, "stat'ing file to open as zip archive")
@@ -228,19 +270,19 @@ func (ai *ArchiveInfo) GetExtractor(file eos.File, consumer *state.Consumer) (sa
 			return nil, errors.Wrap(err, "creating zip extractor")
 		}
 		return ex, nil
-	case ArchiveStrategyTar:
+	case StrategyTar:
 		return tarextractor.New(seeksource.FromFile(file)), nil
-	case ArchiveStrategyTarGz:
+	case StrategyTarGz:
 		return tarextractor.New(gzipsource.New(seeksource.FromFile(file))), nil
-	case ArchiveStrategyTarBz2:
+	case StrategyTarBz2:
 		return tarextractor.New(bzip2source.New(seeksource.FromFile(file))), nil
-	case ArchiveStrategyTarXz:
+	case StrategyTarXz:
 		xs, err := xzsource.New(file, consumer)
 		if err != nil {
 			return nil, errors.Wrap(err, "creating xz extractor")
 		}
 		return tarextractor.New(xs), nil
-	case ArchiveStrategySevenZip:
+	case StrategySevenZip:
 		szex, err := szextractor.New(file, consumer)
 		if err != nil {
 			return nil, errors.Wrap(err, "creating 7-zip extractor")
@@ -258,22 +300,5 @@ func (ai *ArchiveInfo) GetExtractor(file eos.File, consumer *state.Consumer) (sa
 		}
 	}
 
-	return nil, fmt.Errorf("unknown ArchiveStrategy %d", ai.Strategy)
-}
-
-var (
-	archiveStrategyStrings = map[ArchiveStrategy]string{
-		ArchiveStrategyTar:    "tar",
-		ArchiveStrategyTarBz2: "tar.bz2",
-		ArchiveStrategyTarGz:  "tar.gz",
-		ArchiveStrategyZip:    "zip",
-	}
-)
-
-func (as ArchiveStrategy) String() string {
-	str, ok := archiveStrategyStrings[as]
-	if !ok {
-		return "?"
-	}
-	return str
+	return nil, fmt.Errorf("unknown Strategy %d", ai.Strategy)
 }

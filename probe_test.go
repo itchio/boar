@@ -12,20 +12,20 @@ import (
 
 type StrategyTest struct {
 	fileName string
-	result   ArchiveStrategy
+	result   Strategy
 }
 
 var (
 	strategyTests = []StrategyTest{
-		{"foo_bar.zip", ArchiveStrategyZip},
-		{"foo_bar.tar", ArchiveStrategyTar},
-		{"foo_bar.tar.gz", ArchiveStrategyTarGz},
-		{"foo_bar.tar.bz2", ArchiveStrategyTarBz2},
-		{"foo_bar.7z", ArchiveStrategySevenZip},
-		{"foo_bar.rar", ArchiveStrategySevenZip},
-		{"foo_bar.dmg", ArchiveStrategySevenZip},
-		{"foo_bar.exe", ArchiveStrategySevenZip},
-		{"foo_bar", ArchiveStrategySevenZip},
+		{"foo_bar.zip", StrategyZip},
+		{"foo_bar.tar", StrategyTar},
+		{"foo_bar.tar.gz", StrategyTarGz},
+		{"foo_bar.tar.bz2", StrategyTarBz2},
+		{"foo_bar.7z", StrategySevenZip},
+		{"foo_bar.rar", StrategySevenZip},
+		{"foo_bar.dmg", StrategySevenZip},
+		{"foo_bar.exe", StrategySevenZip},
+		{"foo_bar", StrategySevenZip},
 	}
 )
 
@@ -45,7 +45,7 @@ func TestGetStrategyNoStat(t *testing.T) {
 	// Only one test case here
 	ff := fakeFile{}
 	strat := getStrategy(ff, &state.Consumer{})
-	assert.Equal(t, ArchiveStrategyNone, strat)
+	assert.Equal(t, StrategyNone, strat)
 }
 
 type fakeFile struct {

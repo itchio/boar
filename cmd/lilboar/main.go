@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	log.SetFlags(0)
+
 	args := os.Args[1:]
 	if len(args) < 1 {
 		log.Fatal("Usage: lilboar FILE [...FILE]")
@@ -18,23 +20,14 @@ func main() {
 
 	consumer := &state.Consumer{
 		OnMessage: func(lvl string, msg string) {
-			log.Printf("[%s] %s", lvl, msg)
+			log.Printf("%s", msg)
 		},
-	}
-
-	ignoreErrors := len(args) > 1
-
-	errorf := func(msg string, args ...interface{}) {
-		if ignoreErrors {
-			return
-		}
-		consumer.Errorf(msg, args...)
 	}
 
 	doFile := func(filePath string) {
 		file, err := eos.Open(filePath)
 		if err != nil {
-			errorf("%v", err)
+			consumer.Errorf("%s: %v", filePath, err)
 			return
 		}
 		defer file.Close()
@@ -44,7 +37,7 @@ func main() {
 			Consumer: consumer,
 		})
 		if err != nil {
-			errorf("%v", err)
+			consumer.Errorf("%s: %v", filePath, err)
 			return
 		}
 

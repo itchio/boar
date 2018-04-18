@@ -12,7 +12,7 @@ import (
 	"github.com/itchio/wharf/state"
 )
 
-func (ai *ArchiveInfo) ApplyStageTwo(consumer *state.Consumer, aRes *savior.ExtractorResult, installFolder string) (*savior.ExtractorResult, error) {
+func (ai *Info) ApplyStageTwo(consumer *state.Consumer, aRes *savior.ExtractorResult, installFolder string) (*savior.ExtractorResult, error) {
 	switch ai.StageTwoStrategy {
 	case StageTwoStrategyMojoSetup:
 		return ai.applyMojoSetupStageTwo(consumer, aRes, installFolder)
@@ -22,7 +22,7 @@ func (ai *ArchiveInfo) ApplyStageTwo(consumer *state.Consumer, aRes *savior.Extr
 	return aRes, nil
 }
 
-func (ai *ArchiveInfo) applyMojoSetupStageTwo(consumer *state.Consumer, aRes *savior.ExtractorResult, installFolder string) (*savior.ExtractorResult, error) {
+func (ai *Info) applyMojoSetupStageTwo(consumer *state.Consumer, aRes *savior.ExtractorResult, installFolder string) (*savior.ExtractorResult, error) {
 	if len(ai.PostExtract) == 0 {
 		consumer.Infof("No post-extract for mojosetup stage two")
 	}
@@ -36,16 +36,16 @@ func (ai *ArchiveInfo) applyMojoSetupStageTwo(consumer *state.Consumer, aRes *sa
 			}
 			defer file.Close()
 
-			archiveInfo, err := Probe(&ProbeParams{
+			Info, err := Probe(&ProbeParams{
 				Consumer: consumer,
 				File:     file,
 			})
 			if err != nil {
 				return errors.Wrap(err, "probing stage-two file")
 			}
-			consumer.Infof("✓ Post-extract is a supported archive format (%s)", archiveInfo.Format)
+			consumer.Infof("✓ Post-extract is a supported archive format (%s)", Info.Format)
 
-			ex, err := archiveInfo.GetExtractor(file, consumer)
+			ex, err := Info.GetExtractor(file, consumer)
 			if err != nil {
 				return errors.Wrap(err, "getting extractor for stage-two file")
 			}

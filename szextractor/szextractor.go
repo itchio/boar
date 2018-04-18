@@ -3,7 +3,6 @@ package szextractor
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -46,6 +45,19 @@ type szExtractor struct {
 	freed bool
 }
 
+type attempt struct {
+	signature bool
+	ext       string
+}
+
+func (a attempt) String() string {
+	if a.signature {
+		return "signature"
+	} else {
+		return fmt.Sprintf(".%s", a.ext)
+	}
+}
+
 var _ SzExtractor = (*szExtractor)(nil)
 
 func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
@@ -77,64 +89,49 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 
 	ext := nameToExt(stats.Name())
 
-	in, err := sz.NewInStream(file, ext, stats.Size())
-	if err != nil {
-		return nil, errors.Wrap(err, "creating 7-zip input stream")
+	var attempts []attempt
+	if ext != "" {
+		attempts = append(attempts, attempt{ext: ext})
 	}
-	se.in = in
+	attempts = append(attempts, attempt{signature: true})
 
-	var tries []string
+	switch ext {
+	case "exe":
+		// some self-extracting installers only work when we set "cab" explicitly
+		attempts = append(attempts, attempt{ext: "cab"})
+	case "":
+		// .exe and .dmg won't work by signature, so we have to try them explicitly
+		attempts = append(attempts, attempt{ext: "exe"})
+		attempts = append(attempts, attempt{ext: "cab"})
+		attempts = append(attempts, attempt{ext: "dmg"})
+	}
 
-	// try by extension first
-	tries = append(tries, fmt.Sprintf("ext:%s", ext))
-	a, err := lib.OpenArchive(in, false)
-	if err != nil {
-		// try by signature next
-		_, err = in.Seek(0, io.SeekStart)
+	for _, attempt := range attempts {
+		in, err := sz.NewInStream(file, attempt.ext, stats.Size())
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errors.Wrap(err, "creating 7-zip input stream")
 		}
 
-		tries = append(tries, "signature")
-		a, err = lib.OpenArchive(in, true)
-		if err != nil {
-			// With the current libc7zip setup, 7-zip will refuse to
-			// extract some self-extracting installers - for those,
-			// we need to give it the `.cab` extension instead
-			// Maybe the multivolume interface takes care of that?
-			// Command-line `7z` has no issue with them.
-			if ext == "exe" {
-				// if it was an .exe, try with a .cab extension
-				in.Free()
-
-				ext = "cab"
-				tries = append(tries, fmt.Sprintf("ext:%s", ext))
-
-				in, err := sz.NewInStream(file, ext, stats.Size())
-				if err != nil {
-					return nil, errors.Wrap(err, "creating input stream")
-				}
-
-				a, err = lib.OpenArchive(in, false) // by ext
-				if err != nil {
-					return nil, errors.WithMessage(err, fmt.Sprintf("could not open with 7-zip (tried %v)", tries))
-				}
-			} else {
-				// well, we're out of options
-				return nil, errors.Errorf("could not open with 7-zip (tried %v): %s", tries, stats.Name())
-			}
+		archive, err := lib.OpenArchive(in, attempt.signature)
+		if err == nil {
+			se.in = in
+			se.archive = archive
+			break
 		}
+		in.Free()
 	}
-	se.archive = a
 
-	se.format = a.GetArchiveFormat()
+	if se.archive == nil {
+		return nil, errors.Errorf("could not open with 7-zip, tried %v", attempts)
+	}
+
+	se.format = se.archive.GetArchiveFormat()
 	if se.format == "7z" {
 		// .7z is a known non-resumable format - resuming means a lot
 		// of extra IO and decompression work on already-extracted blocks,
 		// so we just don't want to do it on-the-fly
 		se.resumeSupport = savior.ResumeSupportNone
 	}
-
 	return se, nil
 }
 
