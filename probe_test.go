@@ -28,8 +28,8 @@ var (
 		{"foo_bar.7z", StrategySevenZip},
 		{"foo_bar.rar", StrategySevenZip},
 		{"foo_bar.dmg", StrategySevenZip},
-		{"foo_bar.exe", StrategySevenZip},
-		{"foo_bar", StrategySevenZip},
+		{"foo_bar.exe", StrategySevenZipUnsure},
+		{"foo_bar", StrategySevenZipUnsure},
 	}
 )
 
