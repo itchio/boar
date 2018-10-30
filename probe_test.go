@@ -27,7 +27,7 @@ var (
 		{"foo_bar.tar.bz2", StrategyTarBz2},
 		{"foo_bar.7z", StrategySevenZip},
 		{"foo_bar.rar", StrategySevenZip},
-		{"foo_bar.dmg", StrategySevenZip},
+		{"foo_bar.dmg", StrategyDmg},
 		{"foo_bar.exe", StrategySevenZipUnsure},
 		{"foo_bar", StrategySevenZipUnsure},
 	}
