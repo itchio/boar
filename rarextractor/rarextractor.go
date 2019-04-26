@@ -47,9 +47,10 @@ func New(file eos.File, consumer *state.Consumer) (RarExtractor, error) {
 	}
 
 	re := &rarExtractor{
-		file:     file,
-		archive:  archive,
-		consumer: consumer,
+		file:         file,
+		archive:      archive,
+		consumer:     consumer,
+		saveConsumer: savior.NopSaveConsumer(),
 	}
 	runtime.SetFinalizer(re, func(re *rarExtractor) {
 		re.free()
