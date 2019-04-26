@@ -182,6 +182,7 @@ func (re *rarExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savi
 				if entry.UncompressedSize > 0 {
 					localProgress := float64(count) / float64(totalBytes)
 					re.progress = re.initialProgress + localProgress
+					re.consumer.Progress(re.progress)
 				}
 			}, writer)
 
