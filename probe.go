@@ -152,7 +152,6 @@ func Probe(params *ProbeParams) (*Info, error) {
 	if info.Strategy == StrategySevenZip {
 		info.Features = szextractor.FeaturesByExtension(ext)
 		if !info.Features.RandomAccess {
-			consumer.Infof("PSA: %s archives lack random access, not opening yet", ext)
 			return info, nil
 		}
 	}
@@ -160,7 +159,6 @@ func Probe(params *ProbeParams) (*Info, error) {
 	if info.Strategy == StrategyRar {
 		info.Features = rarextractor.Features()
 		if !info.Features.RandomAccess {
-			consumer.Infof("PSA: %s archives lack random access, not opening yet", ext)
 			return info, nil
 		}
 	}
