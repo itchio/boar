@@ -17,4 +17,9 @@ Under the hood, it uses:
 
 ## License
 
-Licensed under MIT License, see `LICENSE` for details.
+boar's code itself is under MIT License, see `LICENSE` for details.
+
+However:
+
+  * `szextractor` uses 7-zip, which is licensed under LGPL and BSD 3-clause, see <https://www.7-zip.org/>
+  * `rarextractor` uses dmc_unrar, which has LGPL and BSD clauses, see <https://github.com/DrMcCoy/dmc_unrar>
