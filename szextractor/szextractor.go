@@ -267,8 +267,6 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 		listEntry(i)
 	}
 
-	se.consumer.Statf("Extracted %s", res.Stats())
-
 	se.free()
 
 	return res, nil

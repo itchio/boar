@@ -230,7 +230,6 @@ func (re *rarExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savi
 	res := &savior.ExtractorResult{
 		Entries: []*savior.Entry{},
 	}
-	re.consumer.Statf("Extracted %s", res.Stats())
 	re.free()
 
 	return res, nil
