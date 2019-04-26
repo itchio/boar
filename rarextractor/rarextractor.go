@@ -193,6 +193,7 @@ func (re *rarExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savi
 			if err != nil {
 				return errors.Wrapf(err, "while extracting (%s)", entry.CanonicalPath)
 			}
+			re.initialProgress = re.progress
 
 			if re.saveConsumer.ShouldSave(cw.Count()) {
 				checkpoint := &savior.ExtractorCheckpoint{
