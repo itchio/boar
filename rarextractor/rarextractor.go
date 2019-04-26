@@ -228,7 +228,7 @@ func (re *rarExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savi
 	}
 
 	res := &savior.ExtractorResult{
-		Entries: []*savior.Entry{},
+		Entries: entries,
 	}
 	re.free()
 
