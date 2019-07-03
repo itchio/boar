@@ -19,8 +19,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/itchio/savior"
-	"github.com/itchio/wharf/eos"
-	"github.com/itchio/wharf/state"
+	"github.com/itchio/httpkit/eos"
+	"github.com/itchio/headway/state"
 )
 
 type Strategy int

@@ -8,11 +8,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/itchio/dmcunrar-go/dmcunrar"
-	"github.com/itchio/httpkit/progress"
+	"github.com/itchio/headway/united"
 	"github.com/itchio/savior"
-	"github.com/itchio/wharf/counter"
-	"github.com/itchio/wharf/eos"
-	"github.com/itchio/wharf/state"
+	"github.com/itchio/headway/counter"
+	"github.com/itchio/httpkit/eos"
+	"github.com/itchio/headway/state"
 )
 
 type RarExtractor interface {
@@ -146,7 +146,7 @@ func (re *rarExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savi
 	}
 
 	if isFresh {
-		re.consumer.Infof("⇓ Pre-allocating %s on disk", progress.FormatBytes(totalBytes))
+		re.consumer.Infof("⇓ Pre-allocating %s on disk", united.FormatBytes(totalBytes))
 		preallocateItem := func(entry *savior.Entry) error {
 			if entry.Kind == savior.EntryKindFile {
 				err := sink.Preallocate(entry)

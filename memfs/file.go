@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/itchio/wharf/eos"
+	"github.com/itchio/httpkit/eos"
 )
 
 // New returns an eos.File with the given data and name

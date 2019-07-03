@@ -8,7 +8,7 @@ import (
 	"github.com/itchio/boar/szextractor"
 	"github.com/itchio/savior"
 	"github.com/itchio/savior/checker"
-	"github.com/itchio/wharf/state"
+	"github.com/itchio/headway/state"
 	"github.com/stretchr/testify/assert"
 )
 

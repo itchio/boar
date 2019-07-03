@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/itchio/sevenzip-go/sz"
-	"github.com/itchio/wharf/state"
+	"github.com/itchio/headway/state"
 )
 
 var _libMutex sync.Mutex

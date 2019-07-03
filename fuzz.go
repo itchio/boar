@@ -8,7 +8,8 @@ import (
 
 	"github.com/itchio/boar/memfs"
 	"github.com/itchio/savior"
-	"github.com/itchio/wharf/state"
+
+	"github.com/itchio/headway/state"
 )
 
 var _dummyConsumer = &state.Consumer{

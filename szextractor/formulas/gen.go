@@ -16,8 +16,8 @@ import (
 
 	"github.com/itchio/arkive/zip"
 	"github.com/itchio/boar/szextractor/types"
-	"github.com/itchio/httpkit/progress"
-	"github.com/itchio/wharf/eos"
+	"github.com/itchio/headway/united"
+	"github.com/itchio/httpkit/eos"
 )
 
 func main() {
@@ -63,7 +63,7 @@ func main() {
 
 		for _, f := range zr.File {
 			func() {
-				log.Printf("  - %s (%s)...", f.Name, progress.FormatBytes(int64(f.UncompressedSize64)))
+				log.Printf("  - %s (%s)...", f.Name, united.FormatBytes(int64(f.UncompressedSize64)))
 
 				de := types.DepEntry{
 					Name: f.Name,

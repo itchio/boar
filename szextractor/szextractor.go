@@ -11,12 +11,11 @@ import (
 	"time"
 
 	"github.com/itchio/boar/notifycloser"
-	"github.com/itchio/httpkit/progress"
+	"github.com/itchio/headway/united"
 	"github.com/itchio/savior"
 	"github.com/itchio/sevenzip-go/sz"
-	"github.com/itchio/wharf/archiver"
-	"github.com/itchio/wharf/eos"
-	"github.com/itchio/wharf/state"
+	"github.com/itchio/httpkit/eos"
+	"github.com/itchio/headway/state"
 	"github.com/pkg/errors"
 )
 
@@ -206,7 +205,7 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 
 	if len(indices) > 0 {
 		if isFresh {
-			se.consumer.Infof("⇓ Pre-allocating %s on disk", progress.FormatBytes(totalBytes))
+			se.consumer.Infof("⇓ Pre-allocating %s on disk", united.FormatBytes(totalBytes))
 			preallocateItem := func(i int64) error {
 				item := se.archive.GetItem(int64(i))
 				defer item.Free()
@@ -424,6 +423,11 @@ const (
 	entryKindSymlink entryKind = 0xa
 )
 
+const (
+	luckyMode = 0777
+	modeMask = 0644
+)
+
 func szEntry(item *sz.Item) *savior.Entry {
 	var kind = entryKindFile
 	var mode os.FileMode = 0644
@@ -432,14 +436,14 @@ func szEntry(item *sz.Item) *savior.Entry {
 		var kindmask uint64 = 0x0000f000
 		var modemask uint64 = 0x000001ff
 		kind = entryKind((attr & kindmask) >> (3 * 4))
-		mode = os.FileMode(attr&modemask) & archiver.LuckyMode
+		mode = os.FileMode(attr&modemask) & luckyMode
 	}
 
 	if attr, ok := item.GetUInt64Property(sz.PidAttrib); ok {
 		var kindmask uint64 = 0xf0000000
 		var modemask uint64 = 0x01ff0000
 		kind = entryKind((attr & kindmask) >> (7 * 4))
-		mode = os.FileMode((attr&modemask)>>(4*4)) & archiver.LuckyMode
+		mode = os.FileMode((attr&modemask)>>(4*4)) & luckyMode
 	}
 
 	if isDir, _ := item.GetBoolProperty(sz.PidIsDir); isDir {
@@ -458,7 +462,7 @@ func szEntry(item *sz.Item) *savior.Entry {
 	}
 
 	if kind == entryKindFile {
-		mode |= archiver.ModeMask
+		mode |= modeMask
 	}
 
 	name, _ := item.GetStringProperty(sz.PidPath)
