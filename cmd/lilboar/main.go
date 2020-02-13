@@ -8,8 +8,8 @@ import (
 	"github.com/itchio/boar"
 	"github.com/itchio/savior"
 
-	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/headway/state"
+	"github.com/itchio/httpkit/eos"
 
 	"net/http"
 	_ "net/http/pprof"
@@ -48,7 +48,7 @@ func main() {
 		}
 		defer file.Close()
 
-		info, err := boar.Probe(&boar.ProbeParams{
+		info, err := boar.Probe(boar.ProbeParams{
 			File:     file,
 			Consumer: consumer,
 		})

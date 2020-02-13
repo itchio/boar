@@ -6,10 +6,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/itchio/savior"
+	"github.com/itchio/headway/state"
 	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/httpkit/eos/option"
-	"github.com/itchio/headway/state"
+	"github.com/itchio/savior"
 )
 
 func (ai *Info) ApplyStageTwo(consumer *state.Consumer, aRes *savior.ExtractorResult, installFolder string) (*savior.ExtractorResult, error) {
@@ -36,7 +36,7 @@ func (ai *Info) applyMojoSetupStageTwo(consumer *state.Consumer, aRes *savior.Ex
 			}
 			defer file.Close()
 
-			Info, err := Probe(&ProbeParams{
+			Info, err := Probe(ProbeParams{
 				Consumer: consumer,
 				File:     file,
 			})

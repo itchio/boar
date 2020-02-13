@@ -20,7 +20,7 @@ var _dummyConsumer = &state.Consumer{
 
 func Fuzz(data []byte) int {
 	file := memfs.New(data, "data")
-	params := &ProbeParams{
+	params := ProbeParams{
 		File:     file,
 		Consumer: _dummyConsumer,
 	}

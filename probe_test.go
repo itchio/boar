@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/headway/state"
+	"github.com/itchio/httpkit/eos"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -114,7 +114,7 @@ func Test_RealFiles(t *testing.T) {
 			}
 
 			defer file.Close()
-			ai, err := Probe(&ProbeParams{
+			ai, err := Probe(ProbeParams{
 				File:     file,
 				Consumer: consumer,
 			})

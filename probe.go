@@ -18,9 +18,9 @@ import (
 	"github.com/itchio/savior/zipextractor"
 	"github.com/pkg/errors"
 
-	"github.com/itchio/savior"
-	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/headway/state"
+	"github.com/itchio/httpkit/eos"
+	"github.com/itchio/savior"
 )
 
 type Strategy int
@@ -122,7 +122,7 @@ func (ai *Info) String() string {
 // wrong with it.
 // Returns (non-nil, nil) if it is a recognized archive type and we
 // are confident we can extract it correctly.
-func Probe(params *ProbeParams) (*Info, error) {
+func Probe(params ProbeParams) (*Info, error) {
 	var strategy Strategy
 	file := params.File
 	consumer := params.Consumer

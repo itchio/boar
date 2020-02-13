@@ -1,10 +1,10 @@
 package boar
 
 import (
-	"github.com/itchio/savior"
+	"github.com/itchio/headway/state"
 	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/httpkit/eos/option"
-	"github.com/itchio/headway/state"
+	"github.com/itchio/savior"
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +21,7 @@ func SimpleExtract(params *SimpleExtractParams) (*savior.ExtractorResult, error)
 	}
 	defer f.Close()
 
-	ai, err := Probe(&ProbeParams{
+	ai, err := Probe(ProbeParams{
 		Consumer: params.Consumer,
 		File:     f,
 	})
