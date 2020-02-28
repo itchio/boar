@@ -75,44 +75,21 @@ func (as Strategy) String() string {
 	}
 }
 
-type StageTwoStrategy int
-
-const (
-	StageTwoStrategyNone StageTwoStrategy = 0
-
-	StageTwoStrategyMojoSetup StageTwoStrategy = 666
-)
-
-func (sts StageTwoStrategy) String() string {
-	switch sts {
-	case StageTwoStrategyNone:
-		return "none"
-	case StageTwoStrategyMojoSetup:
-		return "MojoSetup"
-	}
-	return "<unknown stage two strategy>"
-}
-
 type EntriesLister interface {
 	Entries() []*savior.Entry
 }
 
 type Info struct {
-	Strategy         Strategy
-	Features         savior.ExtractorFeatures
-	Format           string
-	StageTwoStrategy StageTwoStrategy
-	PostExtract      []string
+	Strategy    Strategy
+	Features    savior.ExtractorFeatures
+	Format      string
+	PostExtract []string
 }
 
 func (ai *Info) String() string {
 	res := ""
 	res += fmt.Sprintf("%s (via %s)", ai.Format, ai.Strategy)
 	res += fmt.Sprintf(", %s", ai.Features)
-	if ai.StageTwoStrategy != StageTwoStrategyNone {
-		res += fmt.Sprintf(", stage two: %s", ai.StageTwoStrategy)
-		res += fmt.Sprintf(", post-extract: %v", ai.PostExtract)
-	}
 	return res
 }
 
@@ -226,7 +203,6 @@ func Probe(params ProbeParams) (*Info, error) {
 	info.Features = ex.Features()
 
 	var entries []*savior.Entry
-	stageTwoStrategy := StageTwoStrategyNone
 	// only try listing entries if we have random access support,
 	// otherwise, we risk downloading the whole archive just to list entries.
 	if info.Features.RandomAccess {
@@ -234,67 +210,6 @@ func Probe(params ProbeParams) (*Info, error) {
 			entries = el.Entries()
 			if params.OnEntries != nil {
 				params.OnEntries(entries)
-			}
-		}
-	}
-
-	if len(entries) > 0 {
-		stageTwoMarkers := map[string]StageTwoStrategy{
-			"scripts/mojosetup_init.lua":  StageTwoStrategyMojoSetup,
-			"scripts/mojosetup_init.luac": StageTwoStrategyMojoSetup,
-		}
-
-		for _, e := range entries {
-			if strat, ok := stageTwoMarkers[e.CanonicalPath]; ok {
-				stageTwoStrategy = strat
-				break
-			}
-		}
-
-		if stageTwoStrategy != StageTwoStrategyNone {
-			consumer.Infof("Will apply stage-two strategy %s", stageTwoStrategy)
-			switch stageTwoStrategy {
-			case StageTwoStrategyMojoSetup:
-				info.StageTwoStrategy = stageTwoStrategy
-
-				// Note: canonical paths are slash-separated on all platforms
-				// Also, MojoSetup lets folks specify a different data-prefix,
-				// but *strongly* suggests staying with the default. The code that
-				// follows is probably just one of the many reasons why.
-				dataPrefix := "data/"
-				var dataFiles []string
-				for _, e := range entries {
-					if e.Kind == savior.EntryKindFile {
-						if strings.HasPrefix(e.CanonicalPath, dataPrefix) {
-							dataFiles = append(dataFiles, e.CanonicalPath)
-						}
-					}
-				}
-
-				consumer.Infof("Found %d data files:", len(dataFiles))
-				knownSuffixes := []string{
-					".tar.gz",
-					".tar.bz2",
-					".tar.xz",
-					".zip",
-				}
-
-				for _, df := range dataFiles {
-					for _, suffix := range knownSuffixes {
-						if strings.HasSuffix(strings.ToLower(df), suffix) {
-							info.PostExtract = append(info.PostExtract, df)
-						}
-					}
-				}
-
-				if len(info.PostExtract) > 0 {
-					consumer.Infof("Found %d post-extract files: ", len(info.PostExtract))
-					for _, pe := range info.PostExtract {
-						consumer.Infof("- %s", pe)
-					}
-				} else {
-					consumer.Infof("No post-extract files (crossing fingers)")
-				}
 			}
 		}
 	}
