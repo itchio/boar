@@ -52,8 +52,8 @@ github.com/golang/protobuf v1.3.4/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaW
 github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/itchio/arkive v0.0.0-20200301155608-aeded25a0494 h1:fhYw66BUixPwsSaLvCvY1Tn3H16OfmbxjOHAtzp+VKE=
 github.com/itchio/arkive v0.0.0-20200301155608-aeded25a0494/go.mod h1:EcWY5f3+D6wMuNE1T+zuixVjXN8o1n9dWaRjHEvFd70=
-github.com/itchio/dash v0.0.0-20200305152456-e3adf6cd0462 h1:LFUWnkaTeNd4YTVOvpaI1E4mCiPyDJPZ+e0CBXej6e8=
-github.com/itchio/dash v0.0.0-20200305152456-e3adf6cd0462/go.mod h1:axcS4Nalr4WfCx2HeOYJMXHIDLo68jINxymIdFqtU/4=
+github.com/itchio/dash v0.0.0-20200305193527-478357e813a2 h1:7D1qbveVnrES+MCh+DoVMnFGSVnxYZbOCzInIF4E6eo=
+github.com/itchio/dash v0.0.0-20200305193527-478357e813a2/go.mod h1:f27hhErRVUtpFG1vshSnKgj2RC1EGlhQy0+6CdTjaiA=
 github.com/itchio/dmcunrar-go v0.0.0-20200301160520-3f7579536695 h1:Z1O6eIsBkYKlWAT9YleMiDkIncvdEJem7PC02xtplww=
 github.com/itchio/dmcunrar-go v0.0.0-20200301160520-3f7579536695/go.mod h1:rUrDMGTBACKKDvlSJludmw2F3+vsyYHyhF2YM4E0Mrc=
 github.com/itchio/dskompress v0.0.0-20190702113811-5e6f499be697/go.mod h1:clqOV8HXYpbDC3Bzia6urYIkfgwP1FnDr/C0q8KELmo=
@@ -79,8 +79,8 @@ github.com/itchio/ox v0.0.0-20191031175435-32d876f09b55 h1:EDWFa5o0RY51WpqKkZVax
 github.com/itchio/ox v0.0.0-20191031175435-32d876f09b55/go.mod h1:OkOgnS4mtvTl2n9S65jTihpuQJxeldLBA/x3QSFHQFQ=
 github.com/itchio/ox v0.0.0-20200301160301-4e131878ba64 h1:Gj6bndN7NcJNYbymItdc55apxCYfhMj9DPSVLlilWSI=
 github.com/itchio/ox v0.0.0-20200301160301-4e131878ba64/go.mod h1:WaIT8roTpS2W9zJKdHq4j+Zs5PcEY42H0FQZHQqEZFs=
-github.com/itchio/pelican v0.0.0-20200301161110-c3b05695d102 h1:MDTXTMI1ccmZQkCOZUpYxprMPtQ9rUDwi9l2d7kQXgk=
-github.com/itchio/pelican v0.0.0-20200301161110-c3b05695d102/go.mod h1:yO1VTrLzhasSPQrOvDpfZnkAmNVD6Cv+pbF6hTsWSpM=
+github.com/itchio/pelican v0.0.0-20200305192721-308c3772290a h1:BxkdM/65Z8iA/Uz6hWY3bcC8B32CJbQ8emyRF/9rb+Q=
+github.com/itchio/pelican v0.0.0-20200305192721-308c3772290a/go.mod h1:yO1VTrLzhasSPQrOvDpfZnkAmNVD6Cv+pbF6hTsWSpM=
 github.com/itchio/randsource v0.0.0-20190703104731-3f6d22f91927/go.mod h1:lKWkyaS6DHSVoxVLw7mIeD+po2Kvwv1Hiy8+7VR1zZc=
 github.com/itchio/savior v0.0.0-20200301160120-c73741a23f8b h1:nDcNqogcexZfTaKORTblcdb+HBBOyaLiS5SwQgbiwV8=
 github.com/itchio/savior v0.0.0-20200301160120-c73741a23f8b/go.mod h1:GpmxUXrnJ4hMcKGkwsZJHcDy3XTmOkha6yrp7M/SHS0=
