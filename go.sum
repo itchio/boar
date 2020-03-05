@@ -52,8 +52,8 @@ github.com/golang/protobuf v1.3.4/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaW
 github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/itchio/arkive v0.0.0-20200301155608-aeded25a0494 h1:fhYw66BUixPwsSaLvCvY1Tn3H16OfmbxjOHAtzp+VKE=
 github.com/itchio/arkive v0.0.0-20200301155608-aeded25a0494/go.mod h1:EcWY5f3+D6wMuNE1T+zuixVjXN8o1n9dWaRjHEvFd70=
-github.com/itchio/dash v0.0.0-20200301161523-92fb7eeb9917 h1:LDZ7GdN6pXD7iUQfgwG2w5XFq4GIrwIui3qWrubm5V4=
-github.com/itchio/dash v0.0.0-20200301161523-92fb7eeb9917/go.mod h1:pPYlf+JHLxJQxodz99bN0p6zcJBp0dyARKlzm7nmiu0=
+github.com/itchio/dash v0.0.0-20200305152456-e3adf6cd0462 h1:LFUWnkaTeNd4YTVOvpaI1E4mCiPyDJPZ+e0CBXej6e8=
+github.com/itchio/dash v0.0.0-20200305152456-e3adf6cd0462/go.mod h1:axcS4Nalr4WfCx2HeOYJMXHIDLo68jINxymIdFqtU/4=
 github.com/itchio/dmcunrar-go v0.0.0-20200301160520-3f7579536695 h1:Z1O6eIsBkYKlWAT9YleMiDkIncvdEJem7PC02xtplww=
 github.com/itchio/dmcunrar-go v0.0.0-20200301160520-3f7579536695/go.mod h1:rUrDMGTBACKKDvlSJludmw2F3+vsyYHyhF2YM4E0Mrc=
 github.com/itchio/dskompress v0.0.0-20190702113811-5e6f499be697/go.mod h1:clqOV8HXYpbDC3Bzia6urYIkfgwP1FnDr/C0q8KELmo=
@@ -71,8 +71,8 @@ github.com/itchio/httpkit v0.0.0-20200301151414-2207154e44d1 h1:C1HRom5DCRG024rj
 github.com/itchio/httpkit v0.0.0-20200301151414-2207154e44d1/go.mod h1:ttQmJg3MrzSL0TYYqececx1WLJWjUedAMWoJ0dUbbKA=
 github.com/itchio/kompress v0.0.0-20200301155538-5c2eecce9e51 h1:jipXtdsZClshNO8fKK8ItiVyqE9bKA09as+qjW/yjG0=
 github.com/itchio/kompress v0.0.0-20200301155538-5c2eecce9e51/go.mod h1:iLS+Eq+S26jTC4pbdDH6N5XtDqrjb4IOXtjj1HCzbuk=
-github.com/itchio/lake v0.0.0-20200301160735-98172e1a6370 h1:oawhd3tWCsEtZ0jfQicyKU2OKC6dARA/hgwhlTHaXQI=
-github.com/itchio/lake v0.0.0-20200301160735-98172e1a6370/go.mod h1:yF1QEd82Erd4OseK1riuaowmTZBPt/Xx+Y/zixJguKc=
+github.com/itchio/lake v0.0.0-20200305150023-cc4284ec2b2a h1:wiwopNWPhAzU5qnXW6vcn06Zd/bpXBdre1XNrXDjy5I=
+github.com/itchio/lake v0.0.0-20200305150023-cc4284ec2b2a/go.mod h1:yF1QEd82Erd4OseK1riuaowmTZBPt/Xx+Y/zixJguKc=
 github.com/itchio/lzma v0.0.0-20190703113020-d3e24e3e3d49 h1:+YrBMf3rkLjkT10zIHyVE4S7ma4hqvfjl6XgnzZwS6o=
 github.com/itchio/lzma v0.0.0-20190703113020-d3e24e3e3d49/go.mod h1:avNrevQMli1pYPsz1+HIHMvx95pk6O+6otbWqCZPeZI=
 github.com/itchio/ox v0.0.0-20191031175435-32d876f09b55 h1:EDWFa5o0RY51WpqKkZVaxd1Z7dvPHIJHs73qQPQ6nmA=
