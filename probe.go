@@ -7,7 +7,6 @@ import (
 
 	"github.com/itchio/dash"
 
-	"github.com/itchio/boar/rarextractor"
 	"github.com/itchio/boar/szextractor"
 	"github.com/itchio/boar/szextractor/xzsource"
 	"github.com/itchio/savior/bzip2source"
@@ -42,14 +41,6 @@ const (
 	// .exe files for example - might be self-extracting
 	// archives 7-zip can handle, or they might not.
 	StrategySevenZipUnsure Strategy = 301
-
-	// .dmg files can only be properly extracted on macOS.
-	// 7-zip struggles with ISO9660 disk images for example,
-	// and doesn't support APFS yet (as of 18.05)
-	StrategyDmg Strategy = 400
-
-	// .rar files we do *not* want to open while probing
-	StrategyRar Strategy = 500
 )
 
 func (as Strategy) String() string {
@@ -66,10 +57,6 @@ func (as Strategy) String() string {
 		return "tar.xz"
 	case StrategySevenZip, StrategySevenZipUnsure:
 		return "7-zip"
-	case StrategyDmg:
-		return "dmg"
-	case StrategyRar:
-		return "rar"
 	default:
 		return "<no strategy>"
 	}
@@ -120,20 +107,12 @@ func Probe(params ProbeParams) (*Info, error) {
 		Strategy: strategy,
 	}
 
-	if info.Strategy == StrategyDmg {
-		// There's nothing else we can do about DMG, we don't ship
-		// an extractor for it.
-		return info, nil
-	}
-
 	{
 		checkEarlyExit := true
 
 		switch info.Strategy {
 		case StrategySevenZip:
 			info.Features = szextractor.FeaturesByExtension(ext)
-		case StrategyRar:
-			info.Features = rarextractor.Features()
 		default:
 			checkEarlyExit = false
 		}
@@ -244,10 +223,6 @@ func getStrategy(ext string) Strategy {
 		return StrategyTarBz2
 	case ".tar.xz":
 		return StrategyTarXz
-	case ".dmg":
-		return StrategyDmg
-	case ".rar":
-		return StrategyRar
 	case ".7z":
 		return StrategySevenZip
 	case ".exe":
@@ -270,8 +245,6 @@ func (ai *Info) GetExtractor(file eos.File, consumer *state.Consumer) (savior.Ex
 			return nil, errors.Wrap(err, "creating zip extractor")
 		}
 		return ex, nil
-	case StrategyRar:
-		return rarextractor.New(file, consumer)
 	case StrategyTar:
 		return tarextractor.New(seeksource.FromFile(file)), nil
 	case StrategyTarGz:

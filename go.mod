@@ -5,7 +5,6 @@ go 1.12
 require (
 	github.com/itchio/arkive v0.0.0-20200301155608-aeded25a0494
 	github.com/itchio/dash v0.0.0-20200305193527-478357e813a2
-	github.com/itchio/dmcunrar-go v0.0.0-20200301160520-3f7579536695
 	github.com/itchio/headway v0.0.0-20200301160421-e15721f23905
 	github.com/itchio/httpkit v0.0.0-20200301151414-2207154e44d1
 	github.com/itchio/lzma v0.0.0-20190703113020-d3e24e3e3d49

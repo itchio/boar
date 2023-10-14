@@ -26,8 +26,6 @@ var (
 		{"foo_bar.tar.gz", StrategyTarGz},
 		{"foo_bar.tar.bz2", StrategyTarBz2},
 		{"foo_bar.7z", StrategySevenZip},
-		{"foo_bar.rar", StrategyRar},
-		{"foo_bar.dmg", StrategyDmg},
 		{"foo_bar.exe", StrategySevenZipUnsure},
 		{"foo_bar", StrategySevenZipUnsure},
 	}
@@ -127,8 +125,6 @@ func Test_RealFiles(t *testing.T) {
 
 			expectedType := lastToken
 			switch lastToken {
-			case "dmg":
-				expectedType = "hfs"
 			case "rar4":
 				expectedType = "rar"
 			case "gz":

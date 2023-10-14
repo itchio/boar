@@ -100,7 +100,6 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 		// .exe and .dmg won't work by signature, so we have to try them explicitly
 		attempts = append(attempts, attempt{ext: "exe"})
 		attempts = append(attempts, attempt{ext: "cab"})
-		attempts = append(attempts, attempt{ext: "dmg"})
 	}
 
 	for _, attempt := range attempts {
