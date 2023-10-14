@@ -41,6 +41,14 @@ const (
 	// .exe files for example - might be self-extracting
 	// archives 7-zip can handle, or they might not.
 	StrategySevenZipUnsure Strategy = 301
+
+	// .dmg files can only be properly extracted on macOS.
+	// 7-zip struggles with ISO9660 disk images for example,
+	// and doesn't support APFS yet (as of 18.05)
+	StrategyDmg Strategy = 400
+
+	// .rar files we do *not* want to open while probing
+	StrategyRar Strategy = 500
 )
 
 func (as Strategy) String() string {
