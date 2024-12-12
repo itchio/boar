@@ -54,8 +54,8 @@ github.com/itchio/arkive v0.0.0-20200301155608-aeded25a0494 h1:fhYw66BUixPwsSaLv
 github.com/itchio/arkive v0.0.0-20200301155608-aeded25a0494/go.mod h1:EcWY5f3+D6wMuNE1T+zuixVjXN8o1n9dWaRjHEvFd70=
 github.com/itchio/dash v0.0.0-20200305193527-478357e813a2 h1:7D1qbveVnrES+MCh+DoVMnFGSVnxYZbOCzInIF4E6eo=
 github.com/itchio/dash v0.0.0-20200305193527-478357e813a2/go.mod h1:f27hhErRVUtpFG1vshSnKgj2RC1EGlhQy0+6CdTjaiA=
-github.com/itchio/dmcunrar-go v0.0.0-20200301160520-3f7579536695 h1:Z1O6eIsBkYKlWAT9YleMiDkIncvdEJem7PC02xtplww=
-github.com/itchio/dmcunrar-go v0.0.0-20200301160520-3f7579536695/go.mod h1:rUrDMGTBACKKDvlSJludmw2F3+vsyYHyhF2YM4E0Mrc=
+github.com/itchio/dmcunrar-go v0.0.0-20241212230744-bd86d6b265e9 h1:IvEDt0GFOsRYPNMU3OkW8Kd+HltfMV8xOlHeFy5mzzM=
+github.com/itchio/dmcunrar-go v0.0.0-20241212230744-bd86d6b265e9/go.mod h1:rUrDMGTBACKKDvlSJludmw2F3+vsyYHyhF2YM4E0Mrc=
 github.com/itchio/dskompress v0.0.0-20190702113811-5e6f499be697/go.mod h1:clqOV8HXYpbDC3Bzia6urYIkfgwP1FnDr/C0q8KELmo=
 github.com/itchio/go-brotli v0.0.0-20190702114328-3f28d645a45c h1:Jf20xV/yR/O6eSUqLTuXhka/+54YR59sGwN7b3MkxYk=
 github.com/itchio/go-brotli v0.0.0-20190702114328-3f28d645a45c/go.mod h1:oRXh43p/JW9kWosasd+2kHfDpb1ec4m7YrZ5E39s1iI=

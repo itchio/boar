@@ -8,11 +8,11 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/itchio/dmcunrar-go/dmcunrar"
-	"github.com/itchio/headway/united"
-	"github.com/itchio/savior"
 	"github.com/itchio/headway/counter"
-	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/headway/state"
+	"github.com/itchio/headway/united"
+	"github.com/itchio/httpkit/eos"
+	"github.com/itchio/savior"
 )
 
 type RarExtractor interface {
@@ -254,8 +254,8 @@ func (re *rarExtractor) Features() savior.ExtractorFeatures {
 
 func Features() savior.ExtractorFeatures {
 	return savior.ExtractorFeatures{
-		Name:          "dmc_unrar",
-		Preallocate:   true,
+		Name:        "dmc_unrar",
+		Preallocate: true,
 		// rar has no central directory, and interleaved blocks,
 		// so let's not pretend we meaningfully pause/resume a
 		// download, let's just force downloading to disk first.
