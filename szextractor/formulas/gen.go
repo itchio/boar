@@ -1,4 +1,5 @@
-//+build ignore
+//go:build ignore
+// +build ignore
 
 package main
 
@@ -29,7 +30,7 @@ func main() {
 		"linux-amd64",
 		"darwin-amd64",
 	}
-	baseURL := "https://broth.itch.ovh/libc7zip"
+	baseURL := "https://broth.itch.zone/libc7zip"
 
 	log.Printf("Generating depsMap for %s", version)
 	depSpecMap := make(types.DepSpecMap)
