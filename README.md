@@ -1,7 +1,6 @@
 # boar
 
-[![build status](https://git.itch.ovh/itchio/boar/badges/master/build.svg)](https://git.itch.ovh/itchio/boar/commits/master)
-[![codecov](https://codecov.io/gh/itchio/boar/branch/master/graph/badge.svg)](https://codecov.io/gh/itchio/boar)
+[![build](https://github.com/itchio/boar/actions/workflows/test.yml/badge.svg)](https://github.com/itchio/boar/actions/workflows/test.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/itchio/boar)](https://goreportcard.com/report/github.com/itchio/boar)
 [![GoDoc](https://godoc.org/github.com/itchio/boar?status.svg)](https://godoc.org/github.com/itchio/boar)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/itchio/boar/blob/master/LICENSE)
