@@ -1,23 +1,24 @@
-name: test
+name: build
 
 on: [push, pull_request]
 
 jobs:
-  test:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        go-version: [1.16]
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v4
 
-    - name: Set up Go ${{ matrix.go-version }}
+    - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: ${{ matrix.go-version }}
+        go-version: '1.21'
 
-    - name: test
-      run: |
-        scripts/ci.sh
+    - name: Build
+      run: go build ./...
+
+    - name: Test
+      run: go test ./...

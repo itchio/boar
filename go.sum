@@ -83,8 +83,8 @@ github.com/itchio/savior v0.0.0-20200301160120-c73741a23f8b h1:nDcNqogcexZfTaKOR
 github.com/itchio/savior v0.0.0-20200301160120-c73741a23f8b/go.mod h1:GpmxUXrnJ4hMcKGkwsZJHcDy3XTmOkha6yrp7M/SHS0=
 github.com/itchio/screw v0.0.0-20200301160148-75fc2d65fb38 h1:Mn30eeqfaJDXRxiQzHrh0BLtHVaMgU39xZtpwmoKss8=
 github.com/itchio/screw v0.0.0-20200301160148-75fc2d65fb38/go.mod h1:niqRh/zemDC1HOJiMwUHIsmbgw4t3NTAogGD53Uleqs=
-github.com/itchio/sevenzip-go v0.0.0-20190703112252-e327cec6c376 h1:Qhfx6SvjhcmJzUgwYvBAa2aRqfIGZczXHauOu901uac=
-github.com/itchio/sevenzip-go v0.0.0-20190703112252-e327cec6c376/go.mod h1:5ppm0m2hS/bHydxUQbmuY/U6dsCVaFLmfu+7vY2lwcU=
+github.com/itchio/sevenzip-go v0.0.0-20251211223017-abb980fcfad0 h1:srCFEByJjmfU7YqYpD298HRukkGj0d4TKF6vI+5oitM=
+github.com/itchio/sevenzip-go v0.0.0-20251211223017-abb980fcfad0/go.mod h1:5ppm0m2hS/bHydxUQbmuY/U6dsCVaFLmfu+7vY2lwcU=
 github.com/itchio/spellbook v0.0.0-20200301161431-a4bdbea6b725 h1:zD1SEqqiqaCgJnSauy1+LBq1tDrXFGymk09v90Wr0bA=
 github.com/itchio/spellbook v0.0.0-20200301161431-a4bdbea6b725/go.mod h1:rrZhjXwnFHxTTvfrzI0aeIQDCGqlbGFu7SXam+QcJ94=
 github.com/itchio/wizardry v0.0.0-20200301161332-e8c8c4a5a488 h1:vCTwoe0nfTAKoYUCuIf8lYBz3F4tUzSgREhRwRZ7NDU=
