@@ -3,13 +3,13 @@ module github.com/itchio/boar
 go 1.24.0
 
 require (
-	github.com/itchio/arkive v0.0.0-20200618123031-1a30392a8cfe
+	github.com/itchio/arkive v0.0.0-20260123020546-e17bae820608
 	github.com/itchio/dash v0.0.0-20221120052447-7320435e1835
 	github.com/itchio/dmcunrar-go v0.0.0-20241212230744-bd86d6b265e9
 	github.com/itchio/headway v0.0.0-20251229214354-da882c8b5dd4
 	github.com/itchio/httpkit v0.0.0-20251231162950-9fb57e6ac916
 	github.com/itchio/lzma v0.0.0-20190703113020-d3e24e3e3d49
-	github.com/itchio/savior v0.0.0-20200618124148-6034e878d75b
+	github.com/itchio/savior v0.0.0-20260123024556-94b63eb5a77a
 	github.com/itchio/sevenzip-go v0.0.0-20251211223907-deaa375308d8
 	github.com/nightlyone/lockfile v1.0.0
 	github.com/pkg/errors v0.9.1
