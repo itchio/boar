@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/itchio/boar/notifycloser"
+	"github.com/itchio/headway/state"
 	"github.com/itchio/headway/united"
+	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/savior"
 	"github.com/itchio/sevenzip-go/sz"
-	"github.com/itchio/httpkit/eos"
-	"github.com/itchio/headway/state"
 	"github.com/pkg/errors"
 )
 
@@ -425,7 +425,7 @@ const (
 
 const (
 	luckyMode = 0777
-	modeMask = 0644
+	modeMask  = 0644
 )
 
 func szEntry(item *sz.Item) *savior.Entry {

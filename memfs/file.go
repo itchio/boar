@@ -71,6 +71,6 @@ func (mfi *memoryFileInfo) IsDir() bool {
 	return false
 }
 
-func (mfi *memoryFileInfo) Sys() interface{} {
+func (mfi *memoryFileInfo) Sys() any {
 	return nil
 }

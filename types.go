@@ -4,17 +4,17 @@ import (
 	"errors"
 
 	"github.com/itchio/dash"
-	"github.com/itchio/savior"
-	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/headway/state"
+	"github.com/itchio/httpkit/eos"
+	"github.com/itchio/savior"
 )
 
 var (
 	ErrUnrecognizedArchiveType = errors.New("Unrecognized archive type")
 )
 
-type LoadFunc func(state interface{}) error
-type SaveFunc func(state interface{}) error
+type LoadFunc func(state any) error
+type SaveFunc func(state any) error
 
 type ExtractParams struct {
 	File       eos.File

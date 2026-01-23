@@ -95,7 +95,7 @@ func (ffi fakeFileInfo) ModTime() time.Time {
 func (ffi fakeFileInfo) Mode() os.FileMode {
 	return 0
 }
-func (ffi fakeFileInfo) Sys() interface{} {
+func (ffi fakeFileInfo) Sys() any {
 	return nil
 }
 

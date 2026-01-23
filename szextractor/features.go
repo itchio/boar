@@ -23,7 +23,7 @@ var KnownFeatures = struct {
 		// has "header" (at end of file) with list of files
 		// see http://www.romvault.com/Understanding7z.pdf
 		// but also has interleaved blocks, so it's expensive
-		RandomAccess: false,
+		RandomAccess:  false,
 		ResumeSupport: savior.ResumeSupportNone,
 	},
 	Generic: savior.ExtractorFeatures{

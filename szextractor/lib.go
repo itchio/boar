@@ -3,8 +3,8 @@ package szextractor
 import (
 	"sync"
 
-	"github.com/itchio/sevenzip-go/sz"
 	"github.com/itchio/headway/state"
+	"github.com/itchio/sevenzip-go/sz"
 )
 
 var _libMutex sync.Mutex

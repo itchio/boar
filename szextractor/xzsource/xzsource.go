@@ -5,9 +5,9 @@ import (
 
 	"github.com/itchio/boar/szextractor"
 	"github.com/itchio/boar/szextractor/singlefilesink"
-	"github.com/itchio/savior"
-	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/headway/state"
+	"github.com/itchio/httpkit/eos"
+	"github.com/itchio/savior"
 )
 
 type xzSource struct {

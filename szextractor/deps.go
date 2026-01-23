@@ -14,10 +14,10 @@ import (
 	"github.com/itchio/arkive/zip"
 	"github.com/itchio/boar/szextractor/formulas"
 	"github.com/itchio/boar/szextractor/types"
+	"github.com/itchio/headway/state"
 	"github.com/itchio/headway/united"
 	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/httpkit/eos/option"
-	"github.com/itchio/headway/state"
 	"github.com/nightlyone/lockfile"
 	"github.com/pkg/errors"
 )
