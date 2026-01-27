@@ -51,7 +51,9 @@ func main() {
 		zipURL := fmt.Sprintf("%s/%s/%s/.zip", baseURL, osarch, version)
 
 		f, err := eos.Open(zipURL)
-		must(err)
+		if err != nil {
+			log.Fatalf("failed to open %s: %+v", zipURL, err)
+		}
 		defer f.Close()
 
 		stats, err := f.Stat()
