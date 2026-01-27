@@ -76,14 +76,15 @@ func main() {
 				must(err)
 				defer r.Close()
 
+				hashAlgos := []types.HashAlgo{types.HashAlgoSHA1, types.HashAlgoSHA256}
 				hashes := map[types.HashAlgo]hash.Hash{
 					types.HashAlgoSHA1:   sha1.New(),
 					types.HashAlgoSHA256: sha256.New(),
 				}
 
 				var writers []io.Writer
-				for _, h := range hashes {
-					writers = append(writers, h)
+				for _, algo := range hashAlgos {
+					writers = append(writers, hashes[algo])
 				}
 
 				mw := io.MultiWriter(writers...)
@@ -93,10 +94,10 @@ func main() {
 
 				de.Size = copiedBytes
 
-				for algo, h := range hashes {
+				for _, algo := range hashAlgos {
 					de.Hashes = append(de.Hashes, types.DepHash{
 						Algo:  algo,
-						Value: fmt.Sprintf("%x", h.Sum(nil)),
+						Value: fmt.Sprintf("%x", hashes[algo].Sum(nil)),
 					})
 				}
 
