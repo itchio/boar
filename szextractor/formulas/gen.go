@@ -28,7 +28,9 @@ func main() {
 		"windows-amd64",
 		"linux-386",
 		"linux-amd64",
+		"linux-arm64",
 		"darwin-amd64",
+		"darwin-arm64",
 	}
 	baseURL := "https://broth.itch.zone/libc7zip"
 
