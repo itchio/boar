@@ -25,6 +25,7 @@ Formats with native dependencies will fail to extract if the required libraries 
 ## Dependencies
 
   * <https://github.com/itchio/savior> - for resumable extraction (zip, tar)
+  * <https://github.com/itchio/arkive> - fork of Go's `archive/zip` and `archive/tar` with resume support (used by savior)
   * <https://github.com/itchio/dash> - for file sniffing
   * <https://github.com/itchio/sevenzip-go> - for 7z and self-extracting archives
   * <https://github.com/itchio/dmcunrar-go> - for RAR archives
