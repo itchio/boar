@@ -22,15 +22,15 @@ import (
 )
 
 func main() {
-	version := "1.7.0"
+	version := "1.9.0"
 	osarches := []string{
-		"windows-386",
-		"windows-amd64",
-		"linux-386",
 		"linux-amd64",
 		"linux-arm64",
 		"darwin-amd64",
 		"darwin-arm64",
+		"windows-386",
+		"windows-amd64",
+		"windows-arm64",
 	}
 	baseURL := "https://broth.itch.zone/libc7zip"
 
