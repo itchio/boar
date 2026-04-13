@@ -22,6 +22,14 @@ boar will sniff any archive, and maybe even let you extract it.
 
 Formats with native dependencies will fail to extract if the required libraries are not available. The pure Go extractors work without any additional dependencies.
 
+### Native library installation
+
+The `szextractor` package can automatically download the required 7-zip native libraries at runtime from [broth.itch.zone/libc7zip](https://broth.itch.zone/libc7zip), itch.io's binary distribution service. When `szextractor.EnsureDeps` is called, it checks for the required libraries next to the executable and fetches them from broth if they are missing or have mismatched hashes.
+
+By default, library versions and hashes are pinned in the hardcoded formulas under `szextractor/formulas/`. You can override this to fetch from a specific broth channel (e.g. `head` for the latest build) using `szextractor.SetDepChannel("head")`, which skips hash verification and fetches from `broth.itch.zone/libc7zip/{os}-{arch}-{channel}/LATEST/archive.zip`. The `szextractor.InstallDeps` function can be used to force a fresh download regardless of what is already on disk.
+
+Set the environment variable `BUTLER_NO_DEPS=1` to disable automatic dependency fetching entirely.
+
 ## Dependencies
 
   * <https://github.com/itchio/savior> - for resumable extraction (zip, tar)
