@@ -103,13 +103,13 @@ func InstallDeps(consumer *state.Consumer) error {
 	if depChannelOverride != "" {
 		channel := depChannel()
 		source = channelSourceURL(channel)
-		consumer.Opf("Installing dependencies from channel %s...", channel)
+		consumer.Opf("Installing dependencies from %s", source)
 	} else {
 		if len(depSpec.Sources) == 0 {
 			return errors.New("No sources available for dependencies")
 		}
 		source = depSpec.Sources[0]
-		consumer.Opf("Installing dependencies...")
+		consumer.Opf("Installing dependencies from %s", source)
 	}
 
 	err = fetchDeps(consumer, source, depSpec.Entries, execDir)
