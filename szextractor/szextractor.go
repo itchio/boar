@@ -94,8 +94,9 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 
 	switch ext {
 	case "exe":
-		// some self-extracting installers only work when we set "cab" explicitly
+		// some self-extracting installers only work when we set the format explicitly
 		attempts = append(attempts, attempt{ext: "cab"})
+		attempts = append(attempts, attempt{ext: "nsis"})
 	case "":
 		// .exe and .dmg won't work by signature, so we have to try them explicitly
 		attempts = append(attempts, attempt{ext: "exe"})
