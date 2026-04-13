@@ -21,6 +21,14 @@ import (
 
 var dontEnsureDeps = os.Getenv("BUTLER_NO_DEPS") == "1"
 var ensuredDeps = false
+var depChannelOverride string
+
+// SetDepChannel overrides the default dependency channel. When set to e.g.
+// "head", deps are fetched from the "{os}-{arch}-head" broth channel,
+// bypassing hash verification from the hardcoded formulas.
+func SetDepChannel(channel string) {
+	depChannelOverride = channel
+}
 
 type SzExtractor interface {
 	savior.Extractor

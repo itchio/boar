@@ -35,6 +35,92 @@ type tempLockfileErr interface {
 	Temporary() bool
 }
 
+func depChannel() string {
+	return fmt.Sprintf("%s-%s-%s", runtime.GOOS, runtime.GOARCH, depChannelOverride)
+}
+
+func channelSourceURL(channel string) string {
+	return fmt.Sprintf("https://broth.itch.zone/libc7zip/%s/LATEST/archive.zip", channel)
+}
+
+func acquireDepLock(consumer *state.Consumer, execDir string) (lockfile.Lockfile, error) {
+	lockFilePath := filepath.Join(execDir, ".boar-deps.lock")
+	lf, err := lockfile.New(lockFilePath)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+
+	err = lf.TryLock()
+	tries := 10
+	for err != nil {
+		if err == lockfile.ErrBusy {
+			time.Sleep(2 * time.Second)
+			err = lf.TryLock()
+			continue
+		}
+
+		// lockfile's recommended way to look for a temporary error
+		if _, ok := err.(tempLockfileErr); ok {
+			consumer.Debugf("Will retry acquiring lock in a few: %s", err.Error())
+			tries--
+			if tries <= 0 {
+				msg := fmt.Sprintf("Too many errors acquiring lock, giving up. Last error was: %s", err.Error())
+				return "", errors.New(msg)
+			}
+
+			time.Sleep(2 * time.Second)
+		} else {
+			return "", errors.WithStack(err)
+		}
+	}
+
+	return lf, nil
+}
+
+// InstallDeps unconditionally downloads and installs the native 7-zip
+// libraries, regardless of whether they already exist on disk. Uses the
+// channel override if set via SetDepChannel, otherwise uses the default
+// formula source.
+func InstallDeps(consumer *state.Consumer) error {
+	depSpec := getDepSpec()
+	if depSpec == nil {
+		return errors.Errorf("No dependencies available for %s-%s", runtime.GOOS, runtime.GOARCH)
+	}
+
+	execPath, err := os.Executable()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	execDir := filepath.Dir(execPath)
+
+	lf, err := acquireDepLock(consumer, execDir)
+	if err != nil {
+		return err
+	}
+	defer lf.Unlock()
+
+	var source string
+	if depChannelOverride != "" {
+		channel := depChannel()
+		source = channelSourceURL(channel)
+		consumer.Opf("Installing dependencies from channel %s...", channel)
+	} else {
+		if len(depSpec.Sources) == 0 {
+			return errors.New("No sources available for dependencies")
+		}
+		source = depSpec.Sources[0]
+		consumer.Opf("Installing dependencies...")
+	}
+
+	err = fetchDeps(consumer, source, depSpec.Entries, execDir)
+	if err != nil {
+		return err
+	}
+
+	ensuredDeps = true
+	return nil
+}
+
 func EnsureDeps(consumer *state.Consumer) error {
 	if dontEnsureDeps {
 		consumer.Debugf("Asked not to ensure dependencies, skipping...")
@@ -58,35 +144,50 @@ func EnsureDeps(consumer *state.Consumer) error {
 	}
 	execDir := filepath.Dir(execPath)
 
-	lockFilePath := filepath.Join(execDir, ".boar-deps.lock")
-	lf, err := lockfile.New(lockFilePath)
+	lf, err := acquireDepLock(consumer, execDir)
 	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	err = lf.TryLock()
-	tries := 10
-	for err != nil {
-		if err == lockfile.ErrBusy {
-			time.Sleep(2 * time.Second)
-			err = lf.TryLock()
-			continue
-		}
-
-		// lockfile's recommended way to look for a temporary error
-		if _, ok := err.(tempLockfileErr); ok {
-			consumer.Debugf("Will retry acquiring lock in a few: %s", err.Error())
-			tries--
-			if tries <= 0 {
-				msg := fmt.Sprintf("Too many errors acquiring lock, giving up. Last error was: %s", err.Error())
-				return errors.New(msg)
-			}
-
-			time.Sleep(2 * time.Second)
-		}
+		return err
 	}
 	defer lf.Unlock()
 
+	if depChannelOverride != "" {
+		err = ensureChannelDeps(consumer, depSpec, execDir)
+	} else {
+		err = ensureFormulaDeps(consumer, depSpec, execDir)
+	}
+	if err != nil {
+		return err
+	}
+
+	ensuredDeps = true
+	return nil
+}
+
+func ensureChannelDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDir string) error {
+	channel := depChannel()
+
+	// Check which files are missing (no hash verification for channel deps)
+	var toFetch []types.DepEntry
+	for _, entry := range depSpec.Entries {
+		entryPath := filepath.Join(execDir, entry.Name)
+		if _, err := os.Stat(entryPath); err != nil {
+			consumer.Debugf("[%s] missing, will fetch from channel %s", entry.Name, channel)
+			toFetch = append(toFetch, entry)
+		}
+	}
+
+	if len(toFetch) == 0 {
+		consumer.Debugf("All dependencies present for channel %s, skipping fetch", channel)
+		return nil
+	}
+
+	source := channelSourceURL(channel)
+	consumer.Opf("Fetching dependencies from channel %s...", channel)
+
+	return fetchDeps(consumer, source, toFetch, execDir)
+}
+
+func ensureFormulaDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDir string) error {
 	var toFetch []types.DepEntry
 
 	for _, entry := range depSpec.Entries {
@@ -162,71 +263,7 @@ func EnsureDeps(consumer *state.Consumer) error {
 			}
 
 			firstSource = false
-			err = func() error {
-				beforeHeal := time.Now()
-
-				f, err := eos.Open(source, option.WithConsumer(consumer))
-				if err != nil {
-					return errors.WithStack(err)
-				}
-				defer f.Close()
-
-				stats, err := f.Stat()
-				if err != nil {
-					return errors.WithStack(err)
-				}
-
-				zr, err := zip.NewReader(f, stats.Size())
-				if err != nil {
-					return errors.WithStack(err)
-				}
-
-				foundFiles := 0
-				var installedSize int64
-				for _, zf := range zr.File {
-					for _, entry := range toFetch {
-						if entry.Name == zf.Name {
-							foundFiles++
-							consumer.Opf("%s (%s)...", entry.Name, united.FormatBytes(int64(zf.UncompressedSize64)))
-							entryPath := filepath.Join(execDir, entry.Name)
-
-							err = func() error {
-								zer, err := zf.Open()
-								if err != nil {
-									return errors.WithStack(err)
-								}
-								defer zer.Close()
-
-								of, err := os.Create(entryPath)
-								if err != nil {
-									return errors.WithStack(err)
-								}
-								defer of.Close()
-
-								writtenBytes, err := io.Copy(of, zer)
-								if err != nil {
-									return errors.WithStack(err)
-								}
-
-								installedSize += writtenBytes
-								return nil
-							}()
-
-							if err != nil {
-								return errors.WithStack(err)
-							}
-						}
-					}
-				}
-
-				if foundFiles < len(toFetch) {
-					return errors.Errorf("Found only %d files of the required %d", foundFiles, len(toFetch))
-				}
-				consumer.Statf("Installed %s's worth of dependencies in %s", united.FormatBytes(installedSize), time.Since(beforeHeal))
-
-				return nil
-			}()
-
+			err := fetchDeps(consumer, source, toFetch, execDir)
 			if err != nil {
 				consumer.Logf("Error while installing dependencies: %s", err.Error())
 				continue
@@ -236,6 +273,70 @@ func EnsureDeps(consumer *state.Consumer) error {
 		consumer.Logf("")
 	}
 
-	ensuredDeps = true
+	return nil
+}
+
+func fetchDeps(consumer *state.Consumer, source string, toFetch []types.DepEntry, execDir string) error {
+	beforeHeal := time.Now()
+
+	f, err := eos.Open(source, option.WithConsumer(consumer))
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	defer f.Close()
+
+	stats, err := f.Stat()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	zr, err := zip.NewReader(f, stats.Size())
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	foundFiles := 0
+	var installedSize int64
+	for _, zf := range zr.File {
+		for _, entry := range toFetch {
+			if entry.Name == zf.Name {
+				foundFiles++
+				consumer.Opf("%s (%s)...", entry.Name, united.FormatBytes(int64(zf.UncompressedSize64)))
+				entryPath := filepath.Join(execDir, entry.Name)
+
+				err = func() error {
+					zer, err := zf.Open()
+					if err != nil {
+						return errors.WithStack(err)
+					}
+					defer zer.Close()
+
+					of, err := os.Create(entryPath)
+					if err != nil {
+						return errors.WithStack(err)
+					}
+					defer of.Close()
+
+					writtenBytes, err := io.Copy(of, zer)
+					if err != nil {
+						return errors.WithStack(err)
+					}
+
+					installedSize += writtenBytes
+					return nil
+				}()
+
+				if err != nil {
+					return errors.WithStack(err)
+				}
+			}
+		}
+	}
+
+	if foundFiles < len(toFetch) {
+		return errors.Errorf("Found only %d files of the required %d", foundFiles, len(toFetch))
+	}
+	consumer.Statf("Installed %s's worth of dependencies in %s", united.FormatBytes(installedSize), time.Since(beforeHeal))
+
 	return nil
 }
