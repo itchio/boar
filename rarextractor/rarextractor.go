@@ -105,9 +105,9 @@ func (re *rarExtractor) getEntry(i int64) (*savior.Entry, error) {
 		e.Kind = savior.EntryKindDir
 		e.Mode = 0755
 	} else {
-		supportErr := re.archive.FileIsSupported(i) != nil
-		if supportErr {
-			return nil, errors.Errorf("rar: an entry cannot be decompressed (%s)", filename)
+		supportErr := re.archive.FileIsSupported(i)
+		if supportErr != nil {
+			return nil, errors.Wrapf(supportErr, "rar: an entry cannot be decompressed (%s)", filename)
 		}
 	}
 
