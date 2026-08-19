@@ -32,6 +32,9 @@ type ProbeParams struct {
 	Consumer  *state.Consumer
 	Candidate *dash.Candidate
 	OnEntries func(entries []*savior.Entry)
+
+	// see zipextractor.Params.NormalizeBackslashes
+	NormalizeZipBackslashes bool
 }
 
 type Contents struct {

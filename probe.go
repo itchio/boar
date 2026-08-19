@@ -84,6 +84,9 @@ type Info struct {
 	Features    savior.ExtractorFeatures
 	Format      string
 	PostExtract []string
+
+	// see zipextractor.Params.NormalizeBackslashes
+	NormalizeZipBackslashes bool `json:",omitempty"`
 }
 
 func (ai *Info) String() string {
@@ -117,7 +120,8 @@ func Probe(params ProbeParams) (*Info, error) {
 	}
 
 	info := &Info{
-		Strategy: strategy,
+		Strategy:                strategy,
+		NormalizeZipBackslashes: params.NormalizeZipBackslashes,
 	}
 
 	if info.Strategy == StrategyDmg {
@@ -265,7 +269,9 @@ func (ai *Info) GetExtractor(file eos.File, consumer *state.Consumer) (savior.Ex
 			return nil, errors.Wrap(err, "stat'ing file to open as zip archive")
 		}
 
-		ex, err := zipextractor.New(file, stats.Size())
+		ex, err := zipextractor.NewWithParams(file, stats.Size(), zipextractor.Params{
+			NormalizeBackslashes: ai.NormalizeZipBackslashes,
+		})
 		if err != nil {
 			return nil, errors.Wrap(err, "creating zip extractor")
 		}

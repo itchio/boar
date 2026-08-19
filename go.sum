@@ -79,8 +79,8 @@ github.com/google/go-cmp v0.5.8/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeN
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
 github.com/itchio/arkive v0.0.0-20200301155608-aeded25a0494/go.mod h1:EcWY5f3+D6wMuNE1T+zuixVjXN8o1n9dWaRjHEvFd70=
-github.com/itchio/arkive v0.0.0-20260123020546-e17bae820608 h1:MMGDeLgzKlS6Nx5NAmW5pETZ//pAHE/5Oa4Ov4iUiJs=
-github.com/itchio/arkive v0.0.0-20260123020546-e17bae820608/go.mod h1:1jjAAhUnNDwHiqnC9YpwH5inlJ1/zZ+eL+MmEh8oGb0=
+github.com/itchio/arkive v0.0.0-20260424164943-5eabdbdce5c8 h1:pSMXKB+oJ1ebQykvGnSFmmf+Uk3eSh1ppaDdCy9sefM=
+github.com/itchio/arkive v0.0.0-20260424164943-5eabdbdce5c8/go.mod h1:1jjAAhUnNDwHiqnC9YpwH5inlJ1/zZ+eL+MmEh8oGb0=
 github.com/itchio/dash v0.0.0-20221120052447-7320435e1835 h1:uchyS8AGfh+l//ZdZ1O7u4MbNElsdMKFFD1C7vMTfS8=
 github.com/itchio/dash v0.0.0-20221120052447-7320435e1835/go.mod h1:f27hhErRVUtpFG1vshSnKgj2RC1EGlhQy0+6CdTjaiA=
 github.com/itchio/dmcunrar-go v0.0.0-20260417004436-431599c00729 h1:GwwF6o+en225Wwpeey80Z+ouzgyNk7gaGvipIpeetro=
@@ -107,8 +107,8 @@ github.com/itchio/pelican v0.0.0-20200305192721-308c3772290a/go.mod h1:yO1VTrLzh
 github.com/itchio/pelican v0.0.0-20200626221820-739b3d7708d2 h1:XrbJuHHAiZ1YEWXjNM+2vWBWZfxxSu66LLOQ5WoYd88=
 github.com/itchio/pelican v0.0.0-20200626221820-739b3d7708d2/go.mod h1:yO1VTrLzhasSPQrOvDpfZnkAmNVD6Cv+pbF6hTsWSpM=
 github.com/itchio/randsource v0.0.0-20190703104731-3f6d22f91927/go.mod h1:lKWkyaS6DHSVoxVLw7mIeD+po2Kvwv1Hiy8+7VR1zZc=
-github.com/itchio/savior v0.0.0-20260123024556-94b63eb5a77a h1:LLB0cSXkFg7K93CwisruZcZDYCFJ2VSNVJcQqZhhw3Q=
-github.com/itchio/savior v0.0.0-20260123024556-94b63eb5a77a/go.mod h1:8EmhrNePUgdrnI8bKrsMdk71qv7+TcFQLxcbxlF9VlE=
+github.com/itchio/savior v0.0.0-20260819185719-dca4d72ed7e2 h1:nq0iFXzEDdMNq3KkAdi9UrxMAUzo8iMjkyVMSXhYpBk=
+github.com/itchio/savior v0.0.0-20260819185719-dca4d72ed7e2/go.mod h1:h8CRhrfOFTMOTKDRWqLZEnC6fSTW0LVADtYs2Da/QPw=
 github.com/itchio/screw v0.0.0-20200301160148-75fc2d65fb38 h1:Mn30eeqfaJDXRxiQzHrh0BLtHVaMgU39xZtpwmoKss8=
 github.com/itchio/screw v0.0.0-20200301160148-75fc2d65fb38/go.mod h1:niqRh/zemDC1HOJiMwUHIsmbgw4t3NTAogGD53Uleqs=
 github.com/itchio/sevenzip-go v0.0.0-20251211223907-deaa375308d8 h1:nCYku4khCthxQOMinOWI0B4qqvptody9sce3RjEiyu4=
