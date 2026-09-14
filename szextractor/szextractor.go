@@ -166,7 +166,9 @@ func (se *szExtractor) Entries() []*savior.Entry {
 
 	for i := int64(0); i < numEntries; i++ {
 		item := se.archive.GetItem(int64(i))
-		entries = append(entries, szEntry(item))
+		if entry := szEntry(item); entry != nil {
+			entries = append(entries, entry)
+		}
 		item.Free()
 	}
 	return entries
@@ -201,6 +203,9 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 		item := se.archive.GetItem(int64(i))
 		defer item.Free()
 		entry := szEntry(item)
+		if entry == nil {
+			return
+		}
 		totalBytes += entry.UncompressedSize
 
 		if int64(i) >= checkpoint.EntryIndex {
@@ -220,7 +225,7 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 				defer item.Free()
 				entry := szEntry(item)
 
-				if entry.Kind == savior.EntryKindFile {
+				if entry != nil && entry.Kind == savior.EntryKindFile {
 					err = sink.Preallocate(entry)
 					if err != nil {
 						return errors.Wrap(err, "preallocating entries")
@@ -268,8 +273,9 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 	listEntry := func(i int64) {
 		item := se.archive.GetItem(i)
 		defer item.Free()
-		entry := szEntry(item)
-		res.Entries = append(res.Entries, entry)
+		if entry := szEntry(item); entry != nil {
+			res.Entries = append(res.Entries, entry)
+		}
 	}
 	for i := int64(0); i < numEntries; i++ {
 		listEntry(i)
@@ -319,6 +325,10 @@ func (sc *szCallbacks) GetStream(item *sz.Item) (*sz.OutStream, error) {
 	se := sc.se
 
 	entry := szEntry(item)
+	if entry == nil {
+		// skipped entry (alternate stream), don't give a stream
+		return nil, nil
+	}
 	entryIndex := item.GetArchiveIndex()
 
 	if entry.Kind == savior.EntryKindDir {
@@ -437,7 +447,14 @@ const (
 	modeMask  = 0644
 )
 
+// szEntry converts a 7-zip item to a savior entry. Returns nil for items
+// that should be skipped entirely: alternate streams (HFS+/APFS extended
+// attributes, NTFS ADS) which 7-zip exposes as "path:name" entries.
 func szEntry(item *sz.Item) *savior.Entry {
+	if isAltStream, _ := item.GetBoolProperty(sz.PidIsAltStream); isAltStream {
+		return nil
+	}
+
 	var kind = entryKindFile
 	var mode os.FileMode = 0644
 

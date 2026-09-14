@@ -22,7 +22,7 @@ import (
 )
 
 func main() {
-	version := "1.9.0"
+	version := "1.10.0"
 	osarches := []string{
 		"linux-amd64",
 		"linux-arm64",
