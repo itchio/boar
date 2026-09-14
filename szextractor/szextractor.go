@@ -20,6 +20,14 @@ import (
 )
 
 var dontEnsureDeps = os.Getenv("BUTLER_NO_DEPS") == "1"
+
+// SetEnsureDeps(false) makes GetLib load whatever libraries sit next to
+// the binary without checking or fetching them, for callers that run
+// InstallDeps at deploy time. Equivalent to BUTLER_NO_DEPS=1.
+func SetEnsureDeps(enabled bool) {
+	dontEnsureDeps = !enabled
+}
+
 var ensuredDeps = false
 var depChannelOverride string
 

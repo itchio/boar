@@ -144,16 +144,34 @@ func EnsureDeps(consumer *state.Consumer) error {
 	}
 	execDir := filepath.Dir(execPath)
 
+	// Look before locking: the install dir may be read-only at runtime
+	// (sandboxed wharfd), and that's fine as long as nothing is missing.
+	toFetch := missingDeps(consumer, depSpec, execDir)
+	if len(toFetch) == 0 {
+		consumer.Debugf("All dependencies present, skipping fetch")
+		ensuredDeps = true
+		return nil
+	}
+
 	lf, err := acquireDepLock(consumer, execDir)
 	if err != nil {
 		return err
 	}
 	defer lf.Unlock()
 
+	// another process may have fetched them while we waited for the lock
+	toFetch = missingDeps(consumer, depSpec, execDir)
+	if len(toFetch) == 0 {
+		ensuredDeps = true
+		return nil
+	}
+
 	if depChannelOverride != "" {
-		err = ensureChannelDeps(consumer, depSpec, execDir)
+		channel := depChannel()
+		consumer.Opf("Fetching dependencies from channel %s...", channel)
+		err = fetchDeps(consumer, channelSourceURL(channel), toFetch, execDir)
 	} else {
-		err = ensureFormulaDeps(consumer, depSpec, execDir)
+		err = healFormulaDeps(consumer, depSpec, toFetch, execDir)
 	}
 	if err != nil {
 		return err
@@ -163,10 +181,17 @@ func EnsureDeps(consumer *state.Consumer) error {
 	return nil
 }
 
-func ensureChannelDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDir string) error {
+// Channel deps only need to exist; formula deps must also match their hashes.
+func missingDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDir string) []types.DepEntry {
+	if depChannelOverride != "" {
+		return missingChannelDeps(consumer, depSpec, execDir)
+	}
+	return missingFormulaDeps(consumer, depSpec, execDir)
+}
+
+func missingChannelDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDir string) []types.DepEntry {
 	channel := depChannel()
 
-	// Check which files are missing (no hash verification for channel deps)
 	var toFetch []types.DepEntry
 	for _, entry := range depSpec.Entries {
 		entryPath := filepath.Join(execDir, entry.Name)
@@ -175,19 +200,10 @@ func ensureChannelDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDir
 			toFetch = append(toFetch, entry)
 		}
 	}
-
-	if len(toFetch) == 0 {
-		consumer.Debugf("All dependencies present for channel %s, skipping fetch", channel)
-		return nil
-	}
-
-	source := channelSourceURL(channel)
-	consumer.Opf("Fetching dependencies from channel %s...", channel)
-
-	return fetchDeps(consumer, source, toFetch, execDir)
+	return toFetch
 }
 
-func ensureFormulaDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDir string) error {
+func missingFormulaDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDir string) []types.DepEntry {
 	var toFetch []types.DepEntry
 
 	for _, entry := range depSpec.Entries {
@@ -252,26 +268,28 @@ func ensureFormulaDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDir
 		}()
 	}
 
-	if len(toFetch) > 0 {
-		consumer.Logf("")
-		consumer.Opf("Healing %d dependencies...", len(toFetch))
+	return toFetch
+}
 
-		firstSource := true
-		for _, source := range depSpec.Sources {
-			if !firstSource {
-				consumer.Logf("Trying next source...")
-			}
+func healFormulaDeps(consumer *state.Consumer, depSpec *types.DepSpec, toFetch []types.DepEntry, execDir string) error {
+	consumer.Logf("")
+	consumer.Opf("Healing %d dependencies...", len(toFetch))
 
-			firstSource = false
-			err := fetchDeps(consumer, source, toFetch, execDir)
-			if err != nil {
-				consumer.Logf("Error while installing dependencies: %s", err.Error())
-				continue
-			}
-			break
+	firstSource := true
+	for _, source := range depSpec.Sources {
+		if !firstSource {
+			consumer.Logf("Trying next source...")
 		}
-		consumer.Logf("")
+
+		firstSource = false
+		err := fetchDeps(consumer, source, toFetch, execDir)
+		if err != nil {
+			consumer.Logf("Error while installing dependencies: %s", err.Error())
+			continue
+		}
+		break
 	}
+	consumer.Logf("")
 
 	return nil
 }
