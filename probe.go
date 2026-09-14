@@ -43,9 +43,6 @@ const (
 	// archives 7-zip can handle, or they might not.
 	StrategySevenZipUnsure Strategy = 301
 
-	// .dmg files can only be properly extracted on macOS.
-	// 7-zip struggles with ISO9660 disk images for example,
-	// and doesn't support APFS yet (as of 18.05)
 	StrategyDmg Strategy = 400
 
 	// .rar files we do *not* want to open while probing
@@ -124,17 +121,11 @@ func Probe(params ProbeParams) (*Info, error) {
 		NormalizeZipBackslashes: params.NormalizeZipBackslashes,
 	}
 
-	if info.Strategy == StrategyDmg {
-		// There's nothing else we can do about DMG, we don't ship
-		// an extractor for it.
-		return info, nil
-	}
-
 	{
 		checkEarlyExit := true
 
 		switch info.Strategy {
-		case StrategySevenZip:
+		case StrategySevenZip, StrategyDmg:
 			info.Features = szextractor.FeaturesByExtension(ext)
 		case StrategyRar:
 			info.Features = rarextractor.Features()
@@ -290,7 +281,7 @@ func (ai *Info) GetExtractor(file eos.File, consumer *state.Consumer) (savior.Ex
 			return nil, errors.Wrap(err, "creating xz extractor")
 		}
 		return tarextractor.New(xs), nil
-	case StrategySevenZip, StrategySevenZipUnsure:
+	case StrategySevenZip, StrategySevenZipUnsure, StrategyDmg:
 		szex, err := szextractor.New(file, consumer)
 		if err != nil {
 			return nil, errors.Wrap(err, "creating 7-zip extractor")
