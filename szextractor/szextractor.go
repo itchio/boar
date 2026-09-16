@@ -261,14 +261,21 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 		if err != nil {
 			return nil, errors.Wrap(err, "creating extract callback")
 		}
+		defer ec.Free()
 
 		err = se.archive.ExtractSeveral(indices, ec)
 		if err != nil {
 			return nil, errors.Wrap(err, "extracting several files")
 		}
 
+		// a save-consumer stop is normal control flow, so it takes precedence
+		// over any per-entry errors 7-zip collected in the callback
 		if sc.stopped {
 			return nil, savior.ErrStop
+		}
+
+		if entryErrs := ec.Errors(); len(entryErrs) > 0 {
+			return nil, errors.Wrapf(entryErrs[0], "7-zip reported %d entry error(s) during extraction", len(entryErrs))
 		}
 	} else {
 		se.consumer.Infof("Nothing to do! (all items extracted)")
