@@ -41,7 +41,7 @@ func lzmaDecompressor(r io.Reader, f *zip.File) io.ReadCloser {
 			}
 
 			lzmaSize := make([]byte, 8)
-			for i := uint32(0); i < 8; i++ {
+			for i := range uint32(8) {
 				lzmaSize[i] = byte(f.UncompressedSize64 >> (8 * i))
 			}
 

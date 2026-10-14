@@ -13,9 +13,9 @@ import (
 )
 
 func TestHealFormulaDepsReturnsCancellation(t *testing.T) {
-	var hits int32
+	var hits atomic.Int32
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		atomic.AddInt32(&hits, 1)
+		hits.Add(1)
 		w.WriteHeader(http.StatusNotFound)
 	}))
 	defer server.Close()
@@ -28,7 +28,7 @@ func TestHealFormulaDepsReturnsCancellation(t *testing.T) {
 	if !errors.Is(err, context.Canceled) {
 		t.Fatalf("expected context.Canceled, got %v", err)
 	}
-	if n := atomic.LoadInt32(&hits); n != 0 {
+	if n := hits.Load(); n != 0 {
 		t.Fatalf("expected no source to be tried after cancel, got %d requests", n)
 	}
 }

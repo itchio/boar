@@ -74,7 +74,7 @@ func (re *rarExtractor) Entries() []*savior.Entry {
 	var entries []*savior.Entry
 
 	numEntries := re.archive.GetFileCount()
-	for i := int64(0); i < numEntries; i++ {
+	for i := range numEntries {
 		entry, err := re.getEntry(i)
 		if err == nil {
 			entries = append(entries, entry)
@@ -136,7 +136,7 @@ func (re *rarExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savi
 	var totalBytes int64
 
 	var entries []*savior.Entry
-	for i := int64(0); i < numEntries; i++ {
+	for i := range numEntries {
 		entry, err := re.getEntry(i)
 		if err != nil {
 			return nil, err

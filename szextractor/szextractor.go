@@ -172,7 +172,7 @@ func (se *szExtractor) Entries() []*savior.Entry {
 		return nil
 	}
 
-	for i := int64(0); i < numEntries; i++ {
+	for i := range numEntries {
 		item := se.archive.GetItem(int64(i))
 		if entry := szEntry(item); entry != nil {
 			entries = append(entries, entry)
@@ -221,7 +221,7 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 		}
 	}
 
-	for i := int64(0); i < numEntries; i++ {
+	for i := range numEntries {
 		prepareItem(i)
 	}
 
@@ -243,7 +243,7 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 			}
 
 			preallocateStart := time.Now()
-			for i := int64(0); i < numEntries; i++ {
+			for i := range numEntries {
 				err = preallocateItem(i)
 				if err != nil {
 					return nil, errors.Wrapf(err, "preallocating item %d", i)
@@ -292,7 +292,7 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 			res.Entries = append(res.Entries, entry)
 		}
 	}
-	for i := int64(0); i < numEntries; i++ {
+	for i := range numEntries {
 		listEntry(i)
 	}
 
