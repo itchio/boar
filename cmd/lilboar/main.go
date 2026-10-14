@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"path/filepath"
@@ -41,7 +42,7 @@ func main() {
 	}
 
 	doFile := func(filePath string) {
-		file, err := eos.Open(filePath)
+		file, err := eos.Open(context.Background(), filePath)
 		if err != nil {
 			consumer.Errorf("%s: %v", filePath, err)
 			return

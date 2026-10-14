@@ -1,6 +1,7 @@
 package szextractor
 
 import (
+	"context"
 	"sync"
 
 	"github.com/itchio/headway/state"
@@ -17,7 +18,9 @@ func GetLib(consumer *state.Consumer) (*sz.Lib, error) {
 	defer _libMutex.Unlock()
 
 	_loadOnce.Do(func() {
-		_libErr = EnsureDeps(consumer)
+		// A process-wide once-init has no owning caller, so no caller's
+		// cancellation may leave the library unloaded for everyone else.
+		_libErr = EnsureDeps(context.Background(), consumer)
 		if _libErr != nil {
 			return
 		}

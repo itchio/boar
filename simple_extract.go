@@ -1,6 +1,7 @@
 package boar
 
 import (
+	"context"
 	"github.com/itchio/headway/state"
 	"github.com/itchio/httpkit/eos"
 	"github.com/itchio/httpkit/eos/option"
@@ -14,8 +15,8 @@ type SimpleExtractParams struct {
 	Consumer          *state.Consumer
 }
 
-func SimpleExtract(params *SimpleExtractParams) (*savior.ExtractorResult, error) {
-	f, err := eos.Open(params.ArchivePath, option.WithConsumer(params.Consumer))
+func SimpleExtract(ctx context.Context, params *SimpleExtractParams) (*savior.ExtractorResult, error) {
+	f, err := eos.Open(ctx, params.ArchivePath, option.WithConsumer(params.Consumer))
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

@@ -1,6 +1,7 @@
 package boar
 
 import (
+	"context"
 	"errors"
 	"io/ioutil"
 	"os"
@@ -108,7 +109,7 @@ func Test_RealFiles(t *testing.T) {
 	consumer := &state.Consumer{}
 	for _, f := range files {
 		t.Run(f.Name(), func(t *testing.T) {
-			file, err := eos.Open(filepath.Join("testdata", f.Name()))
+			file, err := eos.Open(context.Background(), filepath.Join("testdata", f.Name()))
 			if err != nil {
 				panic(err)
 			}

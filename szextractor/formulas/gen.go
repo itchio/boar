@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha1"
 	"crypto/sha256"
 	"fmt"
@@ -52,7 +53,7 @@ func main() {
 
 		zipURL := fmt.Sprintf("%s/%s/%s/.zip", baseURL, osarch, version)
 
-		f, err := eos.Open(zipURL)
+		f, err := eos.Open(context.Background(), zipURL)
 		if err != nil {
 			log.Fatalf("failed to open %s: %+v", zipURL, err)
 		}

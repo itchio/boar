@@ -1,6 +1,7 @@
 package szextractor
 
 import (
+	"context"
 	"crypto/sha1"
 	"crypto/sha256"
 	"fmt"
@@ -81,7 +82,7 @@ func acquireDepLock(consumer *state.Consumer, execDir string) (lockfile.Lockfile
 // libraries, regardless of whether they already exist on disk. Uses the
 // channel override if set via SetDepChannel, otherwise uses the default
 // formula source.
-func InstallDeps(consumer *state.Consumer) error {
+func InstallDeps(ctx context.Context, consumer *state.Consumer) error {
 	depSpec := getDepSpec()
 	if depSpec == nil {
 		return errors.Errorf("No dependencies available for %s-%s", runtime.GOOS, runtime.GOARCH)
@@ -112,7 +113,7 @@ func InstallDeps(consumer *state.Consumer) error {
 		consumer.Opf("Installing dependencies from %s", source)
 	}
 
-	err = fetchDeps(consumer, source, depSpec.Entries, execDir)
+	err = fetchDeps(ctx, consumer, source, depSpec.Entries, execDir)
 	if err != nil {
 		return err
 	}
@@ -121,7 +122,7 @@ func InstallDeps(consumer *state.Consumer) error {
 	return nil
 }
 
-func EnsureDeps(consumer *state.Consumer) error {
+func EnsureDeps(ctx context.Context, consumer *state.Consumer) error {
 	if dontEnsureDeps {
 		consumer.Debugf("Asked not to ensure dependencies, skipping...")
 		return nil
@@ -169,9 +170,9 @@ func EnsureDeps(consumer *state.Consumer) error {
 	if depChannelOverride != "" {
 		channel := depChannel()
 		consumer.Opf("Fetching dependencies from channel %s...", channel)
-		err = fetchDeps(consumer, channelSourceURL(channel), toFetch, execDir)
+		err = fetchDeps(ctx, consumer, channelSourceURL(channel), toFetch, execDir)
 	} else {
-		err = healFormulaDeps(consumer, depSpec, toFetch, execDir)
+		err = healFormulaDeps(ctx, consumer, depSpec, toFetch, execDir)
 	}
 	if err != nil {
 		return err
@@ -271,33 +272,36 @@ func missingFormulaDeps(consumer *state.Consumer, depSpec *types.DepSpec, execDi
 	return toFetch
 }
 
-func healFormulaDeps(consumer *state.Consumer, depSpec *types.DepSpec, toFetch []types.DepEntry, execDir string) error {
+func healFormulaDeps(ctx context.Context, consumer *state.Consumer, depSpec *types.DepSpec, toFetch []types.DepEntry, execDir string) error {
 	consumer.Logf("")
 	consumer.Opf("Healing %d dependencies...", len(toFetch))
 
-	firstSource := true
-	for _, source := range depSpec.Sources {
-		if !firstSource {
+	var lastErr error
+	for i, source := range depSpec.Sources {
+		if i > 0 {
 			consumer.Logf("Trying next source...")
 		}
 
-		firstSource = false
-		err := fetchDeps(consumer, source, toFetch, execDir)
-		if err != nil {
-			consumer.Logf("Error while installing dependencies: %s", err.Error())
-			continue
+		lastErr = fetchDeps(ctx, consumer, source, toFetch, execDir)
+		if lastErr == nil {
+			consumer.Logf("")
+			return nil
 		}
-		break
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+		consumer.Logf("Error while installing dependencies: %s", lastErr.Error())
 	}
-	consumer.Logf("")
-
-	return nil
+	if lastErr == nil {
+		return errors.New("no sources available for dependencies")
+	}
+	return errors.WithMessage(lastErr, "all dependency sources failed")
 }
 
-func fetchDeps(consumer *state.Consumer, source string, toFetch []types.DepEntry, execDir string) error {
+func fetchDeps(ctx context.Context, consumer *state.Consumer, source string, toFetch []types.DepEntry, execDir string) error {
 	beforeHeal := time.Now()
 
-	f, err := eos.Open(source, option.WithConsumer(consumer))
+	f, err := eos.Open(ctx, source, option.WithConsumer(consumer))
 	if err != nil {
 		return errors.WithStack(err)
 	}
