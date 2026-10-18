@@ -1,7 +1,9 @@
 package szextractor_test
 
 import (
+	"errors"
 	"log"
+	"os"
 	"testing"
 
 	"github.com/itchio/boar/memfs"
@@ -9,6 +11,7 @@ import (
 	"github.com/itchio/headway/state"
 	"github.com/itchio/savior"
 	"github.com/itchio/savior/checker"
+	"github.com/itchio/sevenzip-go/sz"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,4 +56,24 @@ func TestSzExtractor(t *testing.T) {
 		i++
 		return i%2 == 0
 	})
+}
+
+func TestSzExtractorNeedPassword(t *testing.T) {
+	data, err := os.ReadFile("testdata/encrypted-headers.7z")
+	must(t, err)
+	_, err = szextractor.New(memfs.New(data, "encrypted-headers.7z"), &state.Consumer{})
+	if !errors.Is(err, sz.ErrNeedPassword) {
+		t.Fatalf("got %v, want sz.ErrNeedPassword", err)
+	}
+}
+
+func TestSzExtractorEncryptedEntries(t *testing.T) {
+	data, err := os.ReadFile("testdata/encrypted-entries.7z")
+	must(t, err)
+	ex, err := szextractor.New(memfs.New(data, "encrypted-entries.7z"), &state.Consumer{})
+	must(t, err)
+	_, err = ex.Resume(nil, checker.NewSink())
+	if !errors.Is(err, sz.ErrNeedPassword) {
+		t.Fatalf("got %v, want sz.ErrNeedPassword", err)
+	}
 }

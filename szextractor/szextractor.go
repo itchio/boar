@@ -120,6 +120,10 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 		attempts = append(attempts, attempt{ext: "dmg"})
 	}
 
+	// An archive with encrypted headers cannot be opened at all without
+	// the password. Callers tell an encrypted archive from an unreadable
+	// one by sz.ErrNeedPassword, so it has to survive the attempt loop.
+	needPassword := false
 	for _, attempt := range attempts {
 		_, err = in.Seek(0, io.SeekStart)
 		if err != nil {
@@ -134,12 +138,18 @@ func New(file eos.File, consumer *state.Consumer) (SzExtractor, error) {
 			se.archive = archive
 			break
 		}
+		if errors.Is(err, sz.ErrNeedPassword) {
+			needPassword = true
+		}
 	}
 
 	if se.archive == nil {
 		if se.in != nil {
 			se.in.Free()
 			se.in = nil
+		}
+		if needPassword {
+			return nil, errors.WithMessagef(sz.ErrNeedPassword, "could not open with 7-zip, tried %v", attempts)
 		}
 		return nil, errors.Errorf("could not open with 7-zip, tried %v", attempts)
 	}
@@ -207,6 +217,10 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 
 	var totalBytes int64
 	var indices []int64
+	// No password is ever handed to 7-zip, and libc7zip declines its
+	// request mid-extraction, which 7-zip then reports as an unsupported
+	// method. The item property says what is really going on.
+	encryptedEntry := ""
 	prepareItem := func(i int64) {
 		item := se.archive.GetItem(int64(i))
 		defer item.Free()
@@ -218,11 +232,17 @@ func (se *szExtractor) Resume(checkpoint *savior.ExtractorCheckpoint, sink savio
 
 		if int64(i) >= checkpoint.EntryIndex {
 			indices = append(indices, int64(i))
+			if encrypted, _ := item.GetBoolProperty(sz.PidEncrypted); encrypted && entry.Kind == savior.EntryKindFile && encryptedEntry == "" {
+				encryptedEntry = entry.CanonicalPath
+			}
 		}
 	}
 
 	for i := range numEntries {
 		prepareItem(i)
+	}
+	if encryptedEntry != "" {
+		return nil, errors.WithMessagef(sz.ErrNeedPassword, "entry %s is encrypted", encryptedEntry)
 	}
 
 	if len(indices) > 0 {

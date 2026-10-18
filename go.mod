@@ -10,7 +10,7 @@ require (
 	github.com/itchio/httpkit v0.0.0-20261014001543-804157f68bf3
 	github.com/itchio/lzma v0.0.0-20190703113020-d3e24e3e3d49
 	github.com/itchio/savior v0.0.0-20261014002740-9a7f4832f631
-	github.com/itchio/sevenzip-go v0.0.0-20260914192131-9ff04bb5e5ce
+	github.com/itchio/sevenzip-go v0.0.0-20261018052135-4aeb2247b776
 	github.com/nightlyone/lockfile v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.11.1
